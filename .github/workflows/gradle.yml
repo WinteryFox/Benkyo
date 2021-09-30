@@ -1,0 +1,44 @@
+name: Kotlin CI
+
+on:
+  push:
+    paths:
+      - '**.gradle'
+      - '**.properties'
+      - '**/src/**'
+      - '.github/workflows/**'
+    branches:
+      - 'master'
+    tags-ignore:
+      - '*.*'
+  pull_request:
+    paths:
+      - '**.gradle'
+      - '**.properties'
+      - '**/src/**'
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    name: Build for JDK ${{ matrix.java }}
+    runs-on: ubuntu-latest
+    #if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name != 'WinteryFox/Benkyo' }}
+    strategy:
+      matrix:
+        java: [ 16 ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v1
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Build with Gradle
+        run: ./gradlew build
+        #if: |
+        #  !contains(github.event.head_commit.message, '[ci skip]') && !contains(github.event.pull_request.title, '[ci skip]')
