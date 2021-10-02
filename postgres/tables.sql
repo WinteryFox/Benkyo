@@ -35,3 +35,8 @@ CREATE TABLE images
     hash TEXT,
     PRIMARY KEY (card, hash)
 );
+
+CREATE TABLE ignored_words
+(
+    card BIGINT PRIMARY KEY REFERENCES cards (id)
+);
