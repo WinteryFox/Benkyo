@@ -1,0 +1,15 @@
+package com.benkyo.decks.repository
+
+import com.benkyo.decks.data.DeckData
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+
+interface DeckRepository {
+    fun getAll(): Flux<DeckData>
+
+    fun getById(id: Long): Mono<DeckData>
+
+    fun save(deckData: DeckData): Mono<Void>
+
+    fun delete(id: Long): Mono<Void>
+}

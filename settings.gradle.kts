@@ -1,10 +1,2 @@
-pluginManagement {
-    repositories {
-        maven { url = uri("https://repo.spring.io/milestone") }
-        maven { url = uri("https://repo.spring.io/snapshot") }
-        gradlePluginPortal()
-    }
-}
-rootProject.name = "benkyo"
-include("accounts")
+rootProject.name = "Benkyo"
 include("decks")

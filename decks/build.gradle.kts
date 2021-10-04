@@ -1,20 +1,17 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.springframework.boot") version "2.6.0-SNAPSHOT"
+    id("org.springframework.boot") version "2.5.5"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("jvm") version "1.5.30"
-    kotlin("plugin.spring") version "1.5.30"
+    kotlin("jvm") version "1.5.31"
+    kotlin("plugin.spring") version "1.5.31"
 }
 
 group = "com.benkyo.decks"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_16
 
 repositories {
     mavenCentral()
-    maven { url = uri("https://repo.spring.io/milestone") }
-    maven { url = uri("https://repo.spring.io/snapshot") }
 }
 
 dependencies {
@@ -26,8 +23,10 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("org.postgresql:postgresql")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.security:spring-security-test")

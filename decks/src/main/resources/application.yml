@@ -1,0 +1,12 @@
+server:
+  port: 8282
+  forward-headers-strategy: native
+
+spring:
+  webflux.base-path: "/api"
+
+  r2dbc:
+    username: ${POSTGRES_USERNAME}
+    name: ${POSTGRES_DATABASE}
+    password: ${POSTGRES_PASSWORD}
+    url: "r2dbc:postgres://${POSTGRES_HOST}"
