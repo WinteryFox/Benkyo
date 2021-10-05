@@ -59,7 +59,4 @@ jobs:
         with:
           java-version: 16
       - name: Push container to Docker Hub
-        env:
-          DOCKER_TOKEN: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: ./gradlew decks:jib
+        run: ./gradlew decks:jib -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }}
