@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service
 class DeckService(
     val repository: DeckRepository
 ) {
-
+    fun getAll() = repository.getAll()
 }
