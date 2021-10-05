@@ -19,8 +19,8 @@ on:
     types: [ opened, synchronize, reopened ]
 
 jobs:
-  build_and_release:
-    name: Build and publish artifacts
+  build:
+    name: Build, test and publish artifacts
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -37,5 +37,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
+      - name: Build
+        run: ./gradlew clean build
+      - name: Run tests
+        run: ./gradlew test
       - name: Push container to Docker Hub
-        run: ./gradlew clean build test jib -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }}
+        run: ./gradlew jib -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }}
