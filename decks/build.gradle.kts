@@ -45,14 +45,6 @@ tasks.withType<Test> {
 }
 
 jib {
-    from {
-        image = "openjdk:16-alpine"
-    }
-    to {
-        image = "winteryfox/benkyo"
-        auth {
-            username = System.getenv("DOCKER_USERNAME")
-            password = System.getenv("DOCKER_PASSWORD")
-        }
-    }
+    from.image = "adoptopenjdk/openjdk16:alpine-jre"
+    to.image = "winteryfox/benkyo"
 }
