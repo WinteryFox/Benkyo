@@ -48,7 +48,7 @@ jobs:
     needs: build
     steps:
       - name: Jib
-      run: ./gradlew decks:jib -Dimage=docker.io/winteryfox/benkyo
+      run: ./gradlew decks:jib
       env:
         DOCKER_TOKEN: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
