@@ -9,5 +9,5 @@ class DeckController(
     val service: DeckService
 ) {
     @GetMapping("/decks")
-    fun getAllDecks() = service.getAll()
+    fun getAllDecks() = service.getAll().map { it.data }
 }
