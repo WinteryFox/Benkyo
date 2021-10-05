@@ -45,6 +45,9 @@ tasks.withType<Test> {
 }
 
 jib {
+    from {
+        image = "openjdk:16-alpine"
+    }
     to {
         image = "winteryfox/benkyo"
         auth {
