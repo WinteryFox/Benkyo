@@ -4,5 +4,5 @@
 
 # Benkyo
 
-Benkyo is a platform to easily create and manage flash cards including support for audio and images among with many more
+Benkyo is a platform to easily create and manage flash cards including support for audio and images among many other
 features. It's easy to master any kind of vocabulary in any language using Benkyo.
