@@ -1,6 +1,6 @@
 <a href=""><img align="right" src="https://jibiki.app/logo_circle.png" width=27%></a>
 
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/WinteryFox/Benkyo/Kotlin%20CI/master?logo=github&style=flat-square)](https://github.com/WinteryFox/Benkyo/actions)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/WinteryFox/Benkyo/CI/master?logo=github&&style=for-the-badge)](https://github.com/WinteryFox/Benkyo/actions)
 
 # Benkyo
 
