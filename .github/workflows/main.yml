@@ -8,6 +8,8 @@ on:
       - '**/src/**'
       - '.github/workflows/**'
     branches: [ master ]
+    tags-ignore:
+      - '*.*'
   pull_request:
     paths:
       - '**.gradle'
