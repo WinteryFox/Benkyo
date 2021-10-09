@@ -3,6 +3,7 @@ package com.benkyo.decks
 import kotlinx.coroutines.reactor.mono
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
@@ -40,6 +41,7 @@ class Config(
             .csrf().disable()
             .httpBasic().disable()
             .authorizeExchange()
+            .pathMatchers(HttpMethod.GET, "/decks").permitAll()
             .anyExchange().authenticated().and()
             .build()
 }
