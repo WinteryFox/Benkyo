@@ -1,19 +1,13 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    id("org.springframework.boot") version "2.5.5"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("com.google.cloud.tools.jib") version "3.1.4"
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.spring") version "1.5.31"
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
+    id("com.google.cloud.tools.jib")
+    kotlin("jvm")
+    kotlin("plugin.spring")
 }
 
 group = "com.benkyo.decks"
-version = "0.0.1-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
+version = "0.0.1"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
@@ -24,6 +18,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("com.auth0:java-jwt:3.18.2")
+    implementation("com.auth0:jwks-rsa:0.19.0")
 
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("org.postgresql:postgresql")
@@ -31,17 +27,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.security:spring-security-test")
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "16"
-    }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }
 
 jib {
