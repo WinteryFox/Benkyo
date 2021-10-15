@@ -1,6 +1,5 @@
 package com.benkyo.decks.authentication
 
-import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import org.springframework.http.HttpHeaders
