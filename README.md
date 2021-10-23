@@ -1,4 +1,4 @@
-<a href=""><img align="right" src="https://jibiki.app/logo_circle.png" width=27%></a>
+<a href=""><img align="right" src="https://github.com/WinteryFox/BenkyoFrontend/blob/main/public/logo.svg" width=27%></a>
 
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/WinteryFox/Benkyo/CI/master?logo=github&&style=for-the-badge)](https://github.com/WinteryFox/Benkyo/actions)
 
