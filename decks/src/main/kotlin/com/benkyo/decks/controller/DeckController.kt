@@ -2,12 +2,19 @@ package com.benkyo.decks.controller
 
 import com.benkyo.decks.service.DeckService
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class DeckController(
-    val service: DeckService
+    private val service: DeckService
 ) {
     @GetMapping("/decks")
-    fun getAllDecks() = service.getAll().map { it.data }
+    fun getDecks() = service.getAll().map { it.data }
+
+    @GetMapping("/decks/{id}")
+    fun getDeck(@PathVariable id: String) = service.getById(id.toLong()).map { it.data }
+
+    @GetMapping("/decks/{id}/cards")
+    fun getCards(@PathVariable id: String) = service.getCards(id.toLong())
 }

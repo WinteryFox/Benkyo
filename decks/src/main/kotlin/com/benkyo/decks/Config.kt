@@ -41,7 +41,7 @@ class Config(
             .csrf().disable()
             .httpBasic().disable()
             .authorizeExchange()
-            .pathMatchers(HttpMethod.GET, "/decks").permitAll()
+            .pathMatchers(HttpMethod.GET, "/decks/**").permitAll()
             .anyExchange().authenticated().and()
             .build()
 }

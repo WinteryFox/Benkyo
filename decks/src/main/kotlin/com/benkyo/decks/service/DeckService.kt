@@ -9,4 +9,8 @@ class DeckService(
     val repository: DeckRepository
 ) {
     fun getAll() = repository.getAll().map { Deck(it) }
+
+    fun getById(id: Long) = repository.getById(id).map { Deck(it) }
+
+    fun getCards(id: Long) = repository.getCards(id)
 }
