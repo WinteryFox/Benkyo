@@ -6,8 +6,8 @@ import java.time.LocalDateTime
 @Table
 data class DeckData(
     val id: Long,
-    val flags: Int,
     val author: Long,
+    val isPrivate: Boolean,
     val name: String,
     val description: String,
     val sourceLanguage: String,

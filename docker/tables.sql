@@ -10,7 +10,7 @@ CREATE TABLE decks
 (
     id              BIGINT PRIMARY KEY,
     author          BIGINT REFERENCES users (id),
-    flags           SMALLINT                    NOT NULL DEFAULT 0,
+    is_private      BOOLEAN                     NOT NULL DEFAULT FALSE,
     created_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT current_timestamp,
     name            TEXT                        NOT NULL,
     description     TEXT                        NOT NULL,
