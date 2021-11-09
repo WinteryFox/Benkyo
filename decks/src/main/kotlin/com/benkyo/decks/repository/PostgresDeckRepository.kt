@@ -25,15 +25,15 @@ class PostgresDeckRepository(
             .map { row, metadata -> converter.read(DeckData::class.java, row, metadata) }
             .first()
 
-    override fun save(deckData: DeckData): Mono<Void> =
+    override fun save(data: DeckData): Mono<Void> =
         client.sql("INSERT INTO decks (id, author, name, description, source_language, target_language, image_hash) VALUES ($1, $2, $3, $4, $5, $6, $7)")
-            .bind(0, deckData.id)
-            .bind(1, deckData.author)
-            .bind(2, deckData.name)
-            .bind(3, deckData.description)
-            .bind(4, deckData.sourceLanguage)
-            .bind(5, deckData.targetLanguage)
-            .bind(6, deckData.imageHash)
+            .bind(0, data.id)
+            .bind(1, data.author)
+            .bind(2, data.name)
+            .bind(3, data.description)
+            .bind(4, data.sourceLanguage)
+            .bind(5, data.targetLanguage)
+            .bind(6, data.imageHash)
             .then()
 
     override fun delete(id: Long): Mono<Void> =

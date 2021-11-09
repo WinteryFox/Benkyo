@@ -10,7 +10,7 @@ interface DeckRepository {
 
     fun getById(id: Long): Mono<DeckData>
 
-    fun save(deckData: DeckData): Mono<Void>
+    fun save(data: DeckData): Mono<Void>
 
     fun delete(id: Long): Mono<Void>
 

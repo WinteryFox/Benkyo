@@ -1,0 +1,45 @@
+version: "3.3"
+
+services:
+  postgres:
+    image: benkyopostgres
+    volumes:
+      - "postgres:/var/lib/postgresql/data"
+
+  api:
+    depends_on:
+      - postgres
+    image: winteryfox/benkyo
+    environment:
+      POSTGRES_HOST: "localhost"
+      POSTGRES_DATABASE: "postgres"
+      POSTGRES_PASSWORD: "12345"
+      POSTGRES_USERNAME: "postgres"
+    ports:
+      - "8282"
+
+  frontend:
+    image: winteryfox/benkyofrontend
+    volumes:
+      - "frontend:/var/www/html"
+
+  caddy:
+    depends_on:
+      - api
+      - frontend
+    image: "caddy:2.3.0-alpine"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "./Caddyfile:/etc/caddy/Caddyfile"
+      - "frontend:/var/www/html"
+      - "caddy_data:/data"
+      - "caddy_config:/config"
+
+volumes:
+  caddy_data:
+  caddy_config:
+  frontend:
+    driver: local
+  postgres:

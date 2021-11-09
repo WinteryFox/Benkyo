@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.reactive.EnableWebFlux
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.context.ServerSecurityContextRepository
+import org.springframework.web.cors.CorsConfiguration
 
 @Configuration
 @EnableWebFluxSecurity
@@ -37,7 +38,14 @@ class Config(
             .authenticationManager(authenticationManager)
             .securityContextRepository(securityContextRepository)
             .formLogin().disable()
-            .cors().disable()
+            .cors().configurationSource {
+                CorsConfiguration().apply {
+                    allowedOriginPatterns = listOf("*")
+                    allowCredentials = true
+                    allowedMethods = listOf("*")
+                    allowedHeaders = listOf("*")
+                }
+            }.and()
             .csrf().disable()
             .httpBasic().disable()
             .authorizeExchange()

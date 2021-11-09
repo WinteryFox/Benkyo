@@ -1,6 +1,7 @@
 CREATE TABLE users
 (
     id          BIGINT PRIMARY KEY,
+    flags       SMALLINT DEFAULT 0,
     username    TEXT NOT NULL,
     avatar_hash TEXT
 );
@@ -9,12 +10,13 @@ CREATE TABLE decks
 (
     id              BIGINT PRIMARY KEY,
     author          BIGINT REFERENCES users (id),
-    created_at      TIMESTAMP WITHOUT TIME ZONE DEFAULT current_timestamp,
-    name            TEXT       NOT NULL,
-    description     TEXT       NOT NULL,
-    source_language VARCHAR(5) NOT NULL,
-    target_language VARCHAR(5) NOT NULL,
-    image_hash      TEXT
+    flags           SMALLINT                    NOT NULL DEFAULT 0,
+    created_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT current_timestamp,
+    name            TEXT                        NOT NULL,
+    description     TEXT                        NOT NULL,
+    source_language VARCHAR(5)                  NOT NULL,
+    target_language VARCHAR(5)                  NOT NULL,
+    image_hash      TEXT                                 DEFAULT NULL
 );
 
 CREATE TABLE cards

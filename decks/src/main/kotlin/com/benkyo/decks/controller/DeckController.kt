@@ -10,11 +10,12 @@ class DeckController(
     private val service: DeckService
 ) {
     @GetMapping("/decks")
-    fun getDecks() = service.getAll().map { it.data }
+    fun getDecks() = service.getAll().filter { !it.data.isPrivate }.map { it.data }
 
     @GetMapping("/decks/{id}")
     fun getDeck(@PathVariable id: String) = service.getById(id.toLong()).map { it.data }
 
+    // TODO: Check if deck is private
     @GetMapping("/decks/{id}/cards")
     fun getCards(@PathVariable id: String) = service.getCards(id.toLong())
 }
