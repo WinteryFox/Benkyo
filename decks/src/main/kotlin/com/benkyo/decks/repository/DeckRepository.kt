@@ -8,11 +8,11 @@ import reactor.core.publisher.Mono
 interface DeckRepository {
     fun getAll(): Flux<DeckData>
 
-    fun getById(id: Long): Mono<DeckData>
+    fun getById(id: String): Mono<DeckData>
 
     fun save(data: DeckData): Mono<Void>
 
-    fun delete(id: Long): Mono<Void>
+    fun delete(id: String): Mono<Void>
 
-    fun getCards(id: Long): Flux<Card>
+    fun getCards(id: String): Flux<Card>
 }

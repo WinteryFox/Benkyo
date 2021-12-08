@@ -3,6 +3,7 @@ package com.benkyo.decks.authentication
 import com.auth0.jwk.UrlJwkProvider
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.TokenExpiredException
 import kotlinx.coroutines.reactor.mono
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -33,8 +34,7 @@ class JwtAuthenticationManager : ReactiveAuthenticationManager {
         ).build()
         try {
             verifier.verify(authentication.credentials.toString())
-        } catch (exception: RuntimeException) {
-            exception.printStackTrace()
+        } catch (exception: TokenExpiredException) {
             return@mono null
         }
 

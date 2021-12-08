@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono
 @Repository
 class PostgresDeckRepository(
     private val client: DatabaseClient,
+    private val cardController: CardController,
     private val converter: R2dbcConverter
 ) : DeckRepository {
     override fun getAll(): Flux<DeckData> =
@@ -19,7 +20,7 @@ class PostgresDeckRepository(
             .map { row, metadata -> converter.read(DeckData::class.java, row, metadata) }
             .all()
 
-    override fun getById(id: Long): Mono<DeckData> =
+    override fun getById(id: String): Mono<DeckData> =
         client.sql("SELECT * FROM decks WHERE id = $1")
             .bind(0, id)
             .map { row, metadata -> converter.read(DeckData::class.java, row, metadata) }
@@ -36,20 +37,10 @@ class PostgresDeckRepository(
             .bind(6, data.imageHash)
             .then()
 
-    override fun delete(id: Long): Mono<Void> =
+    override fun delete(id: String): Mono<Void> =
         client.sql("DELETE FROM decks WHERE id = $1")
             .bind(0, id)
             .then()
 
-    override fun getCards(id: Long): Flux<Card> =
-        client.sql("""
-            SELECT cards.id, cards.question, array_agg(a.src) AS answers
-            FROM cards
-                     JOIN answers a on cards.id = a.card
-            WHERE deck = $1
-            group by cards.id
-        """)
-            .bind(0, id)
-            .map { row, metadata -> converter.read(Card::class.java, row, metadata) }
-            .all()
+    override fun getCards(id: String): Flux<Card> = cardController.findAllByDeck(id)
 }
