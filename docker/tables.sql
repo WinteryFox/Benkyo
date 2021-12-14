@@ -63,3 +63,9 @@ CREATE TABLE card_progress
     reviewed_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     PRIMARY KEY (deck, card, "user")
 );
+
+CREATE VIEW cards_with_answers_view AS
+SELECT c.*, array_agg(a.src) answers
+FROM cards c
+         LEFT JOIN answers a on c.id = a.card
+GROUP BY c.id;

@@ -1,5 +1,5 @@
 import com.benkyo.decks.controller.DeckController
-import com.benkyo.decks.data.DeckData
+import com.benkyo.decks.data.Deck
 import com.benkyo.decks.repository.DeckRepository
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.junit.jupiter.api.Test
@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [DeckController::class])
 @Import(DeckRepository::class)
-class Test(
+class DeckTest(
     @MockBean
     private val repository: DeckRepository,
     private val webClient: WebTestClient
@@ -26,7 +26,7 @@ class Test(
     @Test
     suspend fun testCardRepository() {
         // TODO
-        val deck = DeckData(
+        val deck = Deck(
             "0",
             "0",
             false,
