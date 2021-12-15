@@ -7,11 +7,11 @@ import reactor.core.publisher.Flux
 import java.security.Principal
 
 @RestController
-@RequestMapping("/study")
+@RequestMapping("/study/{deck}")
 class StudyController(
     private val deckRepository: DeckRepository
 ) {
-    @GetMapping("/{deck}")
-    fun new(principal: Principal, @PathVariable deck: String): Flux<Card> =
+    @GetMapping
+    fun getNew(principal: Principal, @PathVariable deck: String): Flux<Card> =
         deckRepository.findNewCardsByDeckAndUser(deck, principal.name)
 }
