@@ -8,15 +8,17 @@ CREATE TABLE users
 
 CREATE TABLE decks
 (
-    id              TEXT PRIMARY KEY,
-    author          TEXT REFERENCES users (id),
-    is_private      BOOLEAN                     NOT NULL DEFAULT FALSE,
-    created_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT current_timestamp,
-    name            TEXT                        NOT NULL,
-    description     TEXT                        NOT NULL,
-    source_language VARCHAR(5)                  NOT NULL,
-    target_language VARCHAR(5)                  NOT NULL,
-    image_hash      TEXT                                 DEFAULT NULL
+    id                TEXT PRIMARY KEY,
+    author            TEXT REFERENCES users (id),
+    is_private        BOOLEAN                     NOT NULL DEFAULT FALSE,
+    created_at        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT current_timestamp,
+    name              TEXT                        NOT NULL,
+    short_description TEXT                        NOT NULL,
+    description       TEXT                        NOT NULL,
+    source_language   VARCHAR(5)                  NOT NULL,
+    target_language   VARCHAR(5)                  NOT NULL,
+    image_hash        TEXT                                 DEFAULT NULL,
+    version           INT                                  DEFAULT 0
 );
 
 CREATE TABLE cards

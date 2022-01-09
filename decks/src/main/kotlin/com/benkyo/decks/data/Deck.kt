@@ -1,6 +1,7 @@
 package com.benkyo.decks.data
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
@@ -11,9 +12,12 @@ data class Deck(
     val author: String,
     val isPrivate: Boolean,
     val name: String,
+    val shortDescription: String,
     val description: String,
     val sourceLanguage: String,
     val targetLanguage: String,
     val createdAt: LocalDateTime,
-    val imageHash: String?
+    val imageHash: String?,
+    @Version
+    val version: Int
 )
