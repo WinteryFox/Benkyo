@@ -25,14 +25,16 @@ CREATE TABLE cards
 (
     id       TEXT PRIMARY KEY,
     deck     TEXT REFERENCES decks (id),
-    question TEXT NOT NULL
+    question TEXT NOT NULL,
+    version  INT DEFAULT 0
 );
 
 CREATE TABLE answers
 (
-    card TEXT REFERENCES cards (id),
-    src  TEXT,
-    PRIMARY KEY (card, src)
+    id      TEXT PRIMARY KEY,
+    card    TEXT REFERENCES cards (id),
+    src     TEXT,
+    version INT DEFAULT 0
 );
 
 CREATE TABLE audio

@@ -1,6 +1,8 @@
 package com.benkyo.decks.controller
 
 import com.benkyo.decks.data.Deck
+import com.benkyo.decks.repository.AnswerRepository
+import com.benkyo.decks.repository.CardRepository
 import com.benkyo.decks.repository.DeckRepository
 import com.benkyo.decks.repository.UserRepository
 import com.benkyo.decks.request.DeckCreateRequest
@@ -19,7 +21,9 @@ import javax.validation.Valid
 @RequestMapping("/decks")
 class DeckController(
     private val userRepository: UserRepository,
-    private val deckRepository: DeckRepository
+    private val deckRepository: DeckRepository,
+    private val cardRepository: CardRepository,
+    private val answerRepository: AnswerRepository
 ) {
     @GetMapping
     suspend fun getDecks(): Flow<Deck> = deckRepository.findAll().filter { !it.isPrivate }
@@ -31,7 +35,7 @@ class DeckController(
         principal: Principal,
         @Valid @RequestBody request: DeckCreateRequest
     ): Deck? {
-        if(userRepository.findById(principal.name) == null) {
+        if (userRepository.findById(principal.name) == null) {
             exchange.response.statusCode = HttpStatus.UNAUTHORIZED
             return null
         }
@@ -62,7 +66,7 @@ class DeckController(
         @Valid @RequestBody request: DeckCreateRequest
     ): Deck? {
         val user = userRepository.findById(principal.name)
-        if(user == null) {
+        if (user == null) {
             exchange.response.statusCode = HttpStatus.UNAUTHORIZED
             return null
         }
@@ -95,6 +99,33 @@ class DeckController(
         )
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}", produces = [APPLICATION_JSON_VALUE])
     suspend fun getDeck(@PathVariable id: String): Deck? = deckRepository.findById(id)
+
+    @DeleteMapping("/{id}")
+    suspend fun deleteDeck(
+        principal: Principal,
+        exchange: ServerWebExchange,
+        @PathVariable id: String
+    ) {
+        val user = userRepository.findById(principal.name)
+        if (user == null) {
+            exchange.response.statusCode = HttpStatus.UNAUTHORIZED
+            return
+        }
+
+        val deck = deckRepository.findById(id)
+        if (deck == null) {
+            exchange.response.statusCode = HttpStatus.BAD_REQUEST
+            return
+        }
+
+        if (deck.author != user.id) {
+            exchange.response.statusCode = HttpStatus.FORBIDDEN
+            return
+        }
+
+        // TODO: Delete answers and cards
+        deckRepository.deleteById(id)
+    }
 }

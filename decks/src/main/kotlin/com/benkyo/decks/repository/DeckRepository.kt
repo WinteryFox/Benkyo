@@ -1,6 +1,6 @@
 package com.benkyo.decks.repository
 
-import com.benkyo.decks.data.Card
+import com.benkyo.decks.data.CardWithAnswers
 import com.benkyo.decks.data.Deck
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
@@ -18,5 +18,5 @@ WHERE c.deck = :deck
 GROUP BY c.id
             """
     )
-    fun findNewCardsByDeckAndUser(deck: String, user: String): Flux<Card>
+    fun findNewCardsByDeckAndUser(deck: String, user: String): Flux<CardWithAnswers>
 }

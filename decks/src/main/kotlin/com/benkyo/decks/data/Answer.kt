@@ -4,12 +4,12 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
 
-@Table("cards")
-data class Card(
+@Table("answers")
+data class Answer(
     @Id
     val id: String,
-    val deck: String,
-    val question: String,
+    val card: String,
+    val src: String,
     @Version
     val version: Int
 )
