@@ -1,5 +1,6 @@
 package com.benkyo.decks.data
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
@@ -11,13 +12,14 @@ data class Deck(
     val id: String,
     val author: String,
     val isPrivate: Boolean,
+    val createdAt: LocalDateTime,
     val name: String,
     val shortDescription: String,
     val description: String,
     val sourceLanguage: String,
     val targetLanguage: String,
-    val createdAt: LocalDateTime,
     val imageHash: String?,
+    @JsonIgnore
     @Version
-    val version: Int
+    val version: Int = 0
 )

@@ -14,6 +14,7 @@ java.sourceCompatibility = JavaVersion.VERSION_16
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+    implementation("net.lecousin.reactive-data-relational:postgres:0.8.1")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -22,8 +23,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("com.auth0:java-jwt:3.18.2")
-    implementation("com.auth0:jwks-rsa:0.20.0")
+    implementation("com.auth0:java-jwt:3.19.0")
+    implementation("com.auth0:jwks-rsa:0.21.0")
 
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("org.postgresql:postgresql")

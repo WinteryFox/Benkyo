@@ -1,29 +1,22 @@
 package com.benkyo.decks.controller
 
-import com.benkyo.decks.data.Answer
-import com.benkyo.decks.data.Card
-import com.benkyo.decks.data.CardWithAnswers
 import com.benkyo.decks.repository.*
-import com.benkyo.decks.request.CreateCardRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import java.security.Principal
-import java.util.*
 
 @RestController
 @RequestMapping("/decks/{id}/cards")
 class CardController(
-    private val userRepository: UserRepository,
     private val deckRepository: DeckRepository,
     private val cardRepository: CardRepository,
-    private val cardWithAnswersRepository: CardWithAnswersRepository,
     private val answerRepository: AnswerRepository
 ) {
     @GetMapping
-    fun getCards(@PathVariable id: String) = cardWithAnswersRepository.findAllByDeck(id)
+    fun getCards(@PathVariable id: String) = cardRepository.findAllByDeck(id)
 
-    @PostMapping
+    /*@PostMapping
     suspend fun createCard(
         principal: Principal,
         exchange: ServerWebExchange,
@@ -40,18 +33,18 @@ class CardController(
             return null
         }
 
-        val card = cardRepository.save(Card(UUID.randomUUID().toString(), id, request.question, 0))
+        val card = cardRepository.save(Card(UUID.randomUUID().toString(), id, 0))
         request.answers.forEach {
-            answerRepository.save(Answer(UUID.randomUUID().toString(), card.id, it, 0))
+            answerRepository.save(Answer(card.id, it))
         } // TODO
         //answerRepository.saveAll(request.answers.map { Answer(UUID.randomUUID().toString(), card.id, it, 0) })
         return CardWithAnswers(
             card.id,
-            card.deck,
+            deck.id,
             card.question,
             request.answers
         )
-    }
+    }*/
 
     @DeleteMapping("/{card}")
     suspend fun deleteCard(

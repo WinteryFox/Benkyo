@@ -17,5 +17,5 @@ class UserController(
     suspend fun getSelf(
         exchange: ServerWebExchange,
         principal: Principal
-    ): User? = repository.findById(principal.name) ?: User(principal.name, 0, null)
+    ): User? = repository.findById(principal.name) ?: User(principal.name)
 }

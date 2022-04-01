@@ -1,9 +1,8 @@
+CREATE SCHEMA decks;
+
 CREATE TABLE users
 (
-    id          TEXT PRIMARY KEY,
-    flags       SMALLINT DEFAULT 0,
-    username    TEXT NOT NULL,
-    avatar_hash TEXT
+    id TEXT PRIMARY KEY
 );
 
 CREATE TABLE decks
@@ -18,40 +17,52 @@ CREATE TABLE decks
     source_language   VARCHAR(5)                  NOT NULL,
     target_language   VARCHAR(5)                  NOT NULL,
     image_hash        TEXT                                 DEFAULT NULL,
-    version           INT                                  DEFAULT 0
+    version           INT                         NOT NULL NOT NULL
 );
 
-CREATE TABLE cards
-(
-    id       TEXT PRIMARY KEY,
-    deck     TEXT REFERENCES decks (id),
-    question TEXT NOT NULL,
-    version  INT DEFAULT 0
-);
-
-CREATE TABLE answers
+CREATE TABLE columns
 (
     id      TEXT PRIMARY KEY,
-    card    TEXT REFERENCES cards (id),
-    src     TEXT,
-    version INT DEFAULT 0
+    deck    TEXT REFERENCES decks (id),
+    name    TEXT     NOT NULL,
+    ordinal SMALLINT NOT NULL,
+    version INT      NOT NULL
 );
 
-CREATE TABLE audio
+-- TODO: Constraint on maximum number of cards
+CREATE TABLE cards
 (
-    card TEXT REFERENCES cards (id),
-    src  TEXT,
-    PRIMARY KEY (card, src)
+    id      TEXT PRIMARY KEY,
+    deck    TEXT REFERENCES decks (id),
+    ordinal SMALLINT NOT NULL,
+    version INT      NOT NULL
 );
 
-CREATE TABLE images
+CREATE TABLE card_data
 (
-    card TEXT REFERENCES cards (id),
-    src  TEXT,
-    PRIMARY KEY (card, src)
+    card     TEXT REFERENCES cards (id),
+    "column" TEXT REFERENCES columns (id),
+    src      TEXT ARRAY,
+    version  INT NOT NULL,
+    PRIMARY KEY (card, "column")
 );
 
-CREATE TABLE ignored_cards
+CREATE TABLE attachments
+(
+    id   TEXT PRIMARY KEY,
+    hash TEXT,
+    mime TEXT,
+    CONSTRAINT attachments_unique UNIQUE (hash, mime)
+);
+
+CREATE TABLE card_attachments
+(
+    attachment TEXT REFERENCES attachments (id),
+    card       TEXT REFERENCES cards (id),
+    PRIMARY KEY (attachment, card)
+);
+
+CREATE TABLE ignored_card
 (
     card   TEXT REFERENCES cards (id),
     "user" TEXT REFERENCES users (id),
@@ -60,16 +71,8 @@ CREATE TABLE ignored_cards
 
 CREATE TABLE card_progress
 (
-    deck          TEXT REFERENCES decks (id),
     card          TEXT REFERENCES cards (id),
     "user"        TEXT REFERENCES users (id),
-    progress      SMALLINT                    NOT NULL,
     reviewed_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    PRIMARY KEY (deck, card, "user")
+    PRIMARY KEY (card, "user", reviewed_date)
 );
-
-CREATE VIEW cards_with_answers_view AS
-SELECT c.*, array_agg(a.src) answers
-FROM cards c
-         LEFT JOIN answers a on c.id = a.card
-GROUP BY c.id;

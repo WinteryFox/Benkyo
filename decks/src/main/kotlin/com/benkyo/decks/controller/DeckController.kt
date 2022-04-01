@@ -21,9 +21,7 @@ import javax.validation.Valid
 @RequestMapping("/decks")
 class DeckController(
     private val userRepository: UserRepository,
-    private val deckRepository: DeckRepository,
-    private val cardRepository: CardRepository,
-    private val answerRepository: AnswerRepository
+    private val deckRepository: DeckRepository
 ) {
     @GetMapping
     suspend fun getDecks(): Flow<Deck> = deckRepository.findAll().filter { !it.isPrivate }
@@ -45,14 +43,13 @@ class DeckController(
                 UUID.randomUUID().toString(),
                 principal.name,
                 request.isPrivate,
+                LocalDateTime.now(),
                 request.name,
                 request.shortDescription,
                 request.description,
                 request.sourceLanguage,
                 request.targetLanguage,
-                LocalDateTime.now(),
-                null,
-                0
+                null
             )
         )
     }
@@ -87,12 +84,12 @@ class DeckController(
                 deck.id,
                 deck.author,
                 request.isPrivate,
+                deck.createdAt,
                 request.name,
                 request.shortDescription,
                 request.description,
                 request.sourceLanguage,
                 request.targetLanguage,
-                deck.createdAt,
                 deck.imageHash, // TODO
                 deck.version
             )
