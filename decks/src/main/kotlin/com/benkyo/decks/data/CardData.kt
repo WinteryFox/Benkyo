@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.mapping.Table
 data class CardData(
     @JsonIgnore
     @ForeignKey
-    val card: String,
+    val card: Card,
     val column: String,
     val src: List<String>,
     @JsonIgnore

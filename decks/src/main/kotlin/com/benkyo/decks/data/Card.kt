@@ -1,8 +1,6 @@
 package com.benkyo.decks.data
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import kotlinx.coroutines.reactor.flux
-import kotlinx.coroutines.reactor.mono
 import net.lecousin.reactive.data.relational.annotations.ForeignTable
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
@@ -17,19 +15,8 @@ data class Card(
     val ordinal: Short,
     @Version
     @JsonIgnore
-    val version: Int = 0,
-
-    @ForeignTable(joinKey = "id", optional = true)
-    val data: Set<CardData>
+    val version: Int = 0
 ) {
-    fun getCardData(): Set<CardData> {
-        return setOf()
-    }
-
-    fun lazyGetData(): Flux<CardData> {
-        return flux {  }
-    }
-
-    fun entityLoaded(): Boolean = false
-    fun loadEntity(): Mono<Card> = toMono()
+    @ForeignTable(joinKey = "card", optional = true)
+    val data: Set<CardData> = setOf()
 }
