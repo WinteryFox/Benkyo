@@ -17,7 +17,7 @@ CREATE TABLE decks
     source_language   VARCHAR(5)                  NOT NULL,
     target_language   VARCHAR(5)                  NOT NULL,
     image_hash        TEXT                                 DEFAULT NULL,
-    version           INT                         NOT NULL NOT NULL
+    version           INT                         NOT NULL
 );
 
 CREATE TABLE columns
@@ -44,7 +44,9 @@ CREATE TABLE card_data
     "column" TEXT REFERENCES columns (id),
     src      TEXT ARRAY,
     version  INT NOT NULL,
-    PRIMARY KEY (card, "column")
+    PRIMARY KEY (card, "column"),
+
+    CONSTRAINT fk_card FOREIGN KEY (card) REFERENCES cards(id)
 );
 
 CREATE TABLE attachments

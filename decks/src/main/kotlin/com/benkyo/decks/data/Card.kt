@@ -1,7 +1,6 @@
 package com.benkyo.decks.data
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import net.lecousin.reactive.data.relational.annotations.ForeignTable
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Table
@@ -15,8 +14,7 @@ data class Card(
     val ordinal: Short,
     @Version
     @JsonIgnore
-    val version: Int = 0
-) {
-    @ForeignTable(joinKey = "card", optional = true)
-    val data: Set<CardData> = setOf()
-}
+    val version: Int = 0,
+
+    val data: List<CardData> = listOf()
+)

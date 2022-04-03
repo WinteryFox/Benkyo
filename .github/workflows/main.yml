@@ -18,47 +18,71 @@ on:
     types: [ opened, synchronize, reopened ]
   workflow_dispatch:
 
+env:
+  POSTGRES_HOST: "postgres"
+
 jobs:
   build:
     name: Build for JDK ${{ matrix.java }}
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
         java: [ 16 ]
+
+    services:
+      postgres:
+        image: postgres
+
+        volumes:
+          - "docker/tables.sql:/docker-entrypoint-initdb.d/tables.sql"
+
+        env:
+          POSTGRES_PASSWORD: "12345"
+
     steps:
       - uses: actions/checkout@v2
+
       - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
+
       - name: Build
         run: ./gradlew clean build
+
       - name: Run tests
         run: ./gradlew test
+
   release:
     name: Publish artifacts
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
     needs: build
+
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
       - uses: actions/cache@v2
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: 16
+
       - name: Publish to Docker Hub
         run: ./gradlew jib -Djib.to.auth.username=${{ secrets.DOCKER_USERNAME }} -Djib.to.auth.password=${{ secrets.DOCKER_PASSWORD }}

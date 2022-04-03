@@ -1,24 +1,39 @@
 package com.benkyo.decks.repository
 
 import com.benkyo.decks.data.Card
-import net.lecousin.reactive.data.relational.query.SelectQuery
-import net.lecousin.reactive.data.relational.query.criteria.Criteria
-import net.lecousin.reactive.data.relational.repository.LcR2dbcRepository
+import com.benkyo.decks.jooq.Tables
+import org.jooq.DSLContext
+import org.jooq.impl.DSL
+import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
-interface CardRepository : LcR2dbcRepository<Card, String> {
-//@Query(
-//    """
-//SELECT c.id, c.deck, c.ordinal, d.*
-//FROM cards c
-//        LEFT JOIN card_data d on c.id = d.card
-//WHERE c.deck = :deck
-//    """
-//)
-    @JvmDefault
+@Repository
+class CardRepository(val dsl: DSLContext) {
     fun findAllByDeck(deck: String): Flux<Card> =
-    SelectQuery.from(Card::class.java, "card")
-        .where(Criteria.property("card", "deck").`is`(deck))
-        .join("card", "data", "card_data")
-        .execute(lcClient)
+        Flux.from(
+            dsl.select(
+                Tables.CARDS.ID,
+                Tables.CARDS.DECK,
+                Tables.CARDS.ORDINAL,
+                Tables.CARDS.VERSION,
+
+                DSL.multiset(
+                    DSL.select()
+                        .from(Tables.CARD_DATA)
+                        .where(Tables.CARD_DATA.CARD.eq(Tables.CARDS.ID))
+                )
+                    .`as`("data")
+                    .convertFrom { it.into(com.benkyo.decks.data.CardData::class.java) },
+            )
+                .from(Tables.CARDS)
+                .where(Tables.CARDS.DECK.eq(deck))
+        )
+            .map { it.into(Card::class.java) }
+
+    fun deleteById(card: String) =
+        Mono.from(
+            dsl.deleteFrom(Tables.CARDS)
+                .where(Tables.CARDS.ID.equal(card))
+        )
 }
