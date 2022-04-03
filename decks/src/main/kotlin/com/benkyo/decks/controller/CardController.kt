@@ -1,6 +1,7 @@
 package com.benkyo.decks.controller
 
 import com.benkyo.decks.repository.*
+import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
@@ -64,6 +65,6 @@ class CardController(
         }
 
         answerRepository.deleteAllByCard(card)
-        cardRepository.deleteById(card)
+        cardRepository.deleteById(card).awaitSingle()
     }
 }
