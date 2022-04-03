@@ -35,5 +35,17 @@ class CardRepository(val dsl: DSLContext) {
         Mono.from(
             dsl.deleteFrom(Tables.CARDS)
                 .where(Tables.CARDS.ID.equal(card))
-        )
+                .returningResult()
+        ).map { it.into(Card::class.java) }
+
+    fun save(card: Card): Mono<Card> = Mono.from(
+        dsl.insertInto(Tables.CARDS)
+            .columns()
+            .onDuplicateKeyUpdate()
+            .set(Tables.CARDS.ID, card.id)
+            .set(Tables.CARDS.DECK, card.deck)
+            .set(Tables.CARDS.ORDINAL, card.ordinal)
+            .set(Tables.CARDS.VERSION, card.version)
+            .returningResult()
+    ).map { it.into(Card::class.java) }
 }
