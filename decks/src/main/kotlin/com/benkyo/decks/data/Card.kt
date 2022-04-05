@@ -18,3 +18,14 @@ data class Card(
 
     val data: List<CardData> = listOf()
 )
+
+data class CardWithDataOrdinal(
+    val id: String,
+    val ordinal: Short,
+    val data: List<CardDataWithOrdinal> = listOf()
+)
+
+data class CardsWithData(
+    val columns: List<Column> = listOf(),
+    val cards: List<CardWithDataOrdinal> = listOf()
+)
