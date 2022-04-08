@@ -1,12 +1,11 @@
 package com.benkyo.decks.controller
 
 import com.benkyo.decks.data.*
-import com.benkyo.decks.repository.ColumnRepository
 import com.benkyo.decks.repository.*
 import com.benkyo.decks.request.CardCreateRequest
-import kotlinx.coroutines.*
-import kotlinx.coroutines.GlobalScope.coroutineContext
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.HttpStatus
@@ -42,12 +41,12 @@ class CardController(
 
         val cards = async(Dispatchers.IO) {
             cardRepository.findAllByDeck(id).toList()
-        }
+        }.await()
 
         val awaitedColumns = columns.await()
         return@coroutineScope CardsWithData(
             awaitedColumns,
-            cards.await().map { card ->
+            cards.map { card ->
                 CardWithDataOrdinal(
                     card.id,
                     card.ordinal,
@@ -57,7 +56,8 @@ class CardController(
                             awaitedColumns.find { data.column == it.id }!!.ordinal,
                             data.src
                         )
-                    }
+                    },
+                    card.attachments
                 )
             }.toList()
         )

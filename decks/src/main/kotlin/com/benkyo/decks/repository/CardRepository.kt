@@ -1,5 +1,6 @@
 package com.benkyo.decks.repository
 
+import com.benkyo.decks.data.Attachment
 import com.benkyo.decks.data.Card
 import com.benkyo.decks.data.CardData
 import com.benkyo.decks.jooq.Tables
@@ -21,6 +22,10 @@ class CardRepository(val dsl: DSLContext) {
                 Tables.CARDS.ORDINAL,
                 Tables.CARDS.VERSION,
 
+//                Tables.ATTACHMENTS.ID.`as`("attachments.id"),
+//                Tables.ATTACHMENTS.MIME.`as`("attachments.mime"),
+//                Tables.ATTACHMENTS.HASH.`as`("attachments.hash"),
+
                 // Select the card data and add it to the Card object under the `data` prop
                 DSL.multiset(
                     DSL.select()
@@ -30,23 +35,20 @@ class CardRepository(val dsl: DSLContext) {
                     .`as`("data")
                     .convertFrom { it.into(CardData::class.java) },
 
-                // TODO: We probably don't need a join table for attachments, we have arrays - this throws atm
-
-//                DSL.multiset(
-//                    DSL.select()
-//                        .from(Tables.CARD_ATTACHMENTS)
-//                        .where(Tables.CARD_ATTACHMENTS.CARD.eq(Tables.CARDS.ID))
-//                )
-//                    .`as`("card_attachments")
-//                    .convertFrom { it.into(CardAttachment::class.java) },
-//
-//                DSL.multiset(
-//                    DSL.select()
-//                        .from(Tables.ATTACHMENTS)
-//                        .where(Tables.ATTACHMENTS.ID.eq(Tables.CARD_ATTACHMENTS.ATTACHMENT))
-//                )
-//                    .`as`("attachments")
-//                    .convertFrom { it.into(Attachment::class.java) }
+                // Select the attachments, omitting the pivot table and storing under the `attachments` prop
+                DSL.multiset(
+                    DSL.select(
+                        Tables.ATTACHMENTS.ID,
+                        Tables.ATTACHMENTS.HASH,
+                        Tables.ATTACHMENTS.MIME
+                    )
+                        .from(Tables.CARD_ATTACHMENTS)
+                        .fullOuterJoin(Tables.ATTACHMENTS)
+                        .on(Tables.ATTACHMENTS.ID.eq(Tables.CARD_ATTACHMENTS.ATTACHMENT))
+                        .where(Tables.CARD_ATTACHMENTS.CARD.eq(Tables.CARDS.ID))
+                )
+                    .`as`("attachments")
+                    .convertFrom { it.into(Attachment::class.java) },
             )
                 .from(Tables.CARDS)
                 .where(Tables.CARDS.DECK.eq(deck))

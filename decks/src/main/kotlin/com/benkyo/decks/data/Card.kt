@@ -17,15 +17,14 @@ data class Card(
     val version: Int = 0,
 
     val data: List<CardData> = listOf(),
-
-    // TODO: See CardRepository to figure out how best to do that
-//    val attachments: List<Attachment> = listOf(),
+    val attachments: List<Attachment> = listOf(),
 )
 
 data class CardWithDataOrdinal(
     val id: String,
     val ordinal: Short,
     val data: List<CardDataWithOrdinal> = listOf(),
+    val attachments: List<Attachment> = listOf()
 )
 
 data class CardsWithData(
