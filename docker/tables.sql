@@ -8,7 +8,7 @@ CREATE TABLE users
 CREATE TABLE decks
 (
     id                TEXT PRIMARY KEY,
-    author            TEXT REFERENCES users (id),
+    author            TEXT,
     is_private        BOOLEAN                     NOT NULL DEFAULT FALSE,
     created_at        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT current_timestamp,
     name              TEXT                        NOT NULL,
@@ -16,35 +16,45 @@ CREATE TABLE decks
     description       TEXT                        NOT NULL,
     source_language   VARCHAR(5)                  NOT NULL,
     target_language   VARCHAR(5)                  NOT NULL,
-    image_hash        TEXT                                 DEFAULT NULL,
-    version           INT                         NOT NULL
+    image_hash        TEXT                        DEFAULT NULL,
+    version           INT                         NOT NULL,
+
+    FOREIGN KEY (author) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE columns
 (
     id      TEXT PRIMARY KEY,
-    deck    TEXT REFERENCES decks (id),
+    deck    TEXT,
     name    TEXT     NOT NULL,
     ordinal SMALLINT NOT NULL,
-    version INT      NOT NULL
+    version INT      NOT NULL,
+
+    FOREIGN KEY (deck) REFERENCES decks(id) ON DELETE CASCADE
 );
 
 -- TODO: Constraint on maximum number of cards
 CREATE TABLE cards
 (
     id      TEXT PRIMARY KEY,
-    deck    TEXT REFERENCES decks (id),
+    deck    TEXT,
     ordinal SMALLINT NOT NULL,
-    version INT      NOT NULL
+    version INT      NOT NULL,
+
+    FOREIGN KEY (deck) REFERENCES decks(id) ON DELETE CASCADE
 );
 
 CREATE TABLE card_data
 (
-    card     TEXT REFERENCES cards (id),
-    "column" TEXT REFERENCES columns (id),
+    card     TEXT,
+    "column" TEXT,
     src      TEXT ARRAY,
     version  INT NOT NULL,
+
     PRIMARY KEY (card, "column"),
+
+    FOREIGN KEY (card)     REFERENCES cards(id)   ON DELETE CASCADE,
+    FOREIGN KEY ("column") REFERENCES columns(id) ON DELETE CASCADE,
 
     CONSTRAINT fk_card FOREIGN KEY (card) REFERENCES cards(id)
 );
@@ -54,27 +64,49 @@ CREATE TABLE attachments
     id   TEXT PRIMARY KEY,
     hash TEXT,
     mime TEXT,
+
     CONSTRAINT attachments_unique UNIQUE (hash, mime)
 );
 
 CREATE TABLE card_attachments
 (
-    attachment TEXT REFERENCES attachments (id),
-    card       TEXT REFERENCES cards (id),
-    PRIMARY KEY (attachment, card)
+    attachment TEXT,
+    card       TEXT,
+
+    PRIMARY KEY (attachment, card),
+
+    FOREIGN KEY (attachment) REFERENCES attachments(id) ON DELETE CASCADE,
+    FOREIGN KEY (card)       REFERENCES cards(id)       ON DELETE CASCADE
 );
 
 CREATE TABLE ignored_card
 (
-    card   TEXT REFERENCES cards (id),
-    "user" TEXT REFERENCES users (id),
-    PRIMARY KEY (card, "user")
+    card   TEXT,
+    "user" TEXT,
+
+    PRIMARY KEY (card, "user"),
+
+    FOREIGN KEY (card)   REFERENCES cards(id) ON DELETE CASCADE,
+    FOREIGN KEY ("user") REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE card_progress
 (
-    card          TEXT REFERENCES cards (id),
-    "user"        TEXT REFERENCES users (id),
+    card          TEXT,
+    "user"        TEXT,
     reviewed_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    PRIMARY KEY (card, "user", reviewed_date)
+
+    PRIMARY KEY (card, "user", reviewed_date),
+
+    FOREIGN KEY (card)   REFERENCES cards(id) ON DELETE CASCADE,
+    FOREIGN KEY ("user") REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE answers
+(
+    card    VARCHAR,
+    src     VARCHAR,
+    version INTEGER NOT NULL,
+
+    FOREIGN KEY (card) REFERENCES cards(id) ON DELETE CASCADE
 );

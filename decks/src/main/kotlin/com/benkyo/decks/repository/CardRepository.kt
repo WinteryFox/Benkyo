@@ -61,6 +61,14 @@ class CardRepository(val dsl: DSLContext) {
                 .returningResult()
         ).map { it.into(Card::class.java) }
 
+    fun deleteByDeck(deck: String) = Flux.from(
+        dsl.deleteFrom(Tables.CARDS)
+            .where(Tables.CARDS.DECK.eq(deck))
+            .returningResult()
+    )
+        .map { it.into(Card::class.java) }
+        .asFlow()
+
     fun save(card: Card): Mono<Card> = Mono.from(
         dsl.insertInto(Tables.CARDS)
             .columns()

@@ -1,8 +1,6 @@
 package com.benkyo.decks.controller
 
 import com.benkyo.decks.data.Deck
-import com.benkyo.decks.repository.AnswerRepository
-import com.benkyo.decks.repository.CardRepository
 import com.benkyo.decks.repository.DeckRepository
 import com.benkyo.decks.repository.UserRepository
 import com.benkyo.decks.request.DeckCreateRequest
@@ -21,7 +19,7 @@ import javax.validation.Valid
 @RequestMapping("/decks")
 class DeckController(
     private val userRepository: UserRepository,
-    private val deckRepository: DeckRepository
+    private val deckRepository: DeckRepository,
 ) {
     @GetMapping
     suspend fun getDecks(): Flow<Deck> = deckRepository.findAll().filter { !it.isPrivate }
@@ -63,12 +61,14 @@ class DeckController(
         @Valid @RequestBody request: DeckCreateRequest
     ): Deck? {
         val user = userRepository.findById(principal.name)
+
         if (user == null) {
             exchange.response.statusCode = HttpStatus.UNAUTHORIZED
             return null
         }
 
         val deck = deckRepository.findById(id)
+
         if (deck == null) {
             exchange.response.statusCode = HttpStatus.BAD_REQUEST
             return null
@@ -80,18 +80,13 @@ class DeckController(
         }
 
         return deckRepository.save(
-            Deck(
-                deck.id,
-                deck.author,
-                request.isPrivate,
-                deck.createdAt,
-                request.name,
-                request.shortDescription,
-                request.description,
-                request.sourceLanguage,
-                request.targetLanguage,
-                deck.imageHash, // TODO
-                deck.version
+            deck.copy(
+                description = request.description,
+                isPrivate = request.isPrivate,
+                name = request.name,
+                shortDescription = request.shortDescription,
+                sourceLanguage = request.sourceLanguage,
+                targetLanguage = request.targetLanguage
             )
         )
     }
@@ -106,12 +101,14 @@ class DeckController(
         @PathVariable id: String
     ) {
         val user = userRepository.findById(principal.name)
+
         if (user == null) {
             exchange.response.statusCode = HttpStatus.UNAUTHORIZED
             return
         }
 
         val deck = deckRepository.findById(id)
+
         if (deck == null) {
             exchange.response.statusCode = HttpStatus.BAD_REQUEST
             return
@@ -122,7 +119,7 @@ class DeckController(
             return
         }
 
-        // TODO: Delete answers and cards
+        // NOTE: Answers and cards should be deleted via cascading automatically
         deckRepository.deleteById(id)
     }
 }
