@@ -16,16 +16,19 @@ data class Card(
     @JsonIgnore
     val version: Int = 0,
 
-    val data: List<CardData> = listOf()
+    val data: List<CardData> = listOf(),
+
+    // TODO: See CardRepository to figure out how best to do that
+//    val attachments: List<Attachment> = listOf(),
 )
 
 data class CardWithDataOrdinal(
     val id: String,
     val ordinal: Short,
-    val data: List<CardDataWithOrdinal> = listOf()
+    val data: List<CardDataWithOrdinal> = listOf(),
 )
 
 data class CardsWithData(
     val columns: List<Column> = listOf(),
-    val cards: List<CardWithDataOrdinal> = listOf()
+    val cards: List<CardWithDataOrdinal> = listOf(),
 )

@@ -20,13 +20,33 @@ class CardRepository(val dsl: DSLContext) {
                 Tables.CARDS.DECK,
                 Tables.CARDS.ORDINAL,
                 Tables.CARDS.VERSION,
+
+                // Select the card data and add it to the Card object under the `data` prop
                 DSL.multiset(
                     DSL.select()
                         .from(Tables.CARD_DATA)
-                        .where(Tables.CARD_DATA.CARD.eq(Tables.CARDS.ID))
+                        .where(Tables.CARD_DATA.CARD.eq(Tables.CARDS.ID)),
                 )
                     .`as`("data")
-                    .convertFrom { it.into(CardData::class.java) }
+                    .convertFrom { it.into(CardData::class.java) },
+
+                // TODO: We probably don't need a join table for attachments, we have arrays - this throws atm
+
+//                DSL.multiset(
+//                    DSL.select()
+//                        .from(Tables.CARD_ATTACHMENTS)
+//                        .where(Tables.CARD_ATTACHMENTS.CARD.eq(Tables.CARDS.ID))
+//                )
+//                    .`as`("card_attachments")
+//                    .convertFrom { it.into(CardAttachment::class.java) },
+//
+//                DSL.multiset(
+//                    DSL.select()
+//                        .from(Tables.ATTACHMENTS)
+//                        .where(Tables.ATTACHMENTS.ID.eq(Tables.CARD_ATTACHMENTS.ATTACHMENT))
+//                )
+//                    .`as`("attachments")
+//                    .convertFrom { it.into(Attachment::class.java) }
             )
                 .from(Tables.CARDS)
                 .where(Tables.CARDS.DECK.eq(deck))
