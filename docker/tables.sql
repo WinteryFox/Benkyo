@@ -34,6 +34,9 @@ CREATE TABLE columns
 );
 
 -- TODO: Constraint on maximum number of cards
+-- From Gareth: We can probably easily do this on the application level, doing it on the database side would require
+-- a complex postgres trigger which would be a real pain to maintain, and would likely just be slower than doing it
+-- ourselves on top of that.
 CREATE TABLE cards
 (
     id      TEXT PRIMARY KEY,
@@ -100,13 +103,4 @@ CREATE TABLE card_progress
 
     FOREIGN KEY (card)   REFERENCES cards(id) ON DELETE CASCADE,
     FOREIGN KEY ("user") REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE answers
-(
-    card    VARCHAR,
-    src     VARCHAR,
-    version INTEGER NOT NULL,
-
-    FOREIGN KEY (card) REFERENCES cards(id) ON DELETE CASCADE
 );
