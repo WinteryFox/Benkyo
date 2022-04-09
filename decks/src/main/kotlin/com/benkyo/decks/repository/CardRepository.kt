@@ -14,6 +14,22 @@ import reactor.core.publisher.Mono
 
 @Repository
 class CardRepository(val dsl: DSLContext) {
+    fun get(deck: String, card: String): Mono<Card?> =
+        Mono.from(
+            dsl.select(
+                Tables.CARDS.ID,
+                Tables.CARDS.DECK,
+                Tables.CARDS.ORDINAL,
+                Tables.CARDS.VERSION,
+            )
+                .from(Tables.CARDS)
+                .where(
+                    Tables.CARDS.DECK.eq(deck).and(
+                        Tables.CARDS.ID.eq(card)
+                    )
+                )
+        ).map { Card(it) }
+
     fun findAllByDeck(deck: String): Flow<Card> =
         Flux.from(
             dsl.select(
@@ -21,10 +37,6 @@ class CardRepository(val dsl: DSLContext) {
                 Tables.CARDS.DECK,
                 Tables.CARDS.ORDINAL,
                 Tables.CARDS.VERSION,
-
-//                Tables.ATTACHMENTS.ID.`as`("attachments.id"),
-//                Tables.ATTACHMENTS.MIME.`as`("attachments.mime"),
-//                Tables.ATTACHMENTS.HASH.`as`("attachments.hash"),
 
                 // Select the card data and add it to the Card object under the `data` prop
                 DSL.multiset(
@@ -53,22 +65,32 @@ class CardRepository(val dsl: DSLContext) {
                 .from(Tables.CARDS)
                 .where(Tables.CARDS.DECK.eq(deck))
         )
-            .map { it.into(Card::class.java) }
+            .map { Card(it) }
             .asFlow()
 
     fun deleteById(card: String) =
         Mono.from(
             dsl.deleteFrom(Tables.CARDS)
                 .where(Tables.CARDS.ID.equal(card))
-                .returningResult()
-        ).map { it.into(Card::class.java) }
+                .returningResult(
+                    Tables.CARDS.ID,
+                    Tables.CARDS.DECK,
+                    Tables.CARDS.ORDINAL,
+                    Tables.CARDS.VERSION,
+                )
+        ).map { Card(it) }
 
     fun deleteByDeck(deck: String) = Flux.from(
         dsl.deleteFrom(Tables.CARDS)
             .where(Tables.CARDS.DECK.eq(deck))
-            .returningResult()
+            .returningResult(
+                Tables.CARDS.ID,
+                Tables.CARDS.DECK,
+                Tables.CARDS.ORDINAL,
+                Tables.CARDS.VERSION,
+            )
     )
-        .map { it.into(Card::class.java) }
+        .map { Card(it) }
         .asFlow()
 
     fun save(card: Card): Mono<Card> = Mono.from(
@@ -79,6 +101,11 @@ class CardRepository(val dsl: DSLContext) {
             .set(Tables.CARDS.DECK, card.deck)
             .set(Tables.CARDS.ORDINAL, card.ordinal)
             .set(Tables.CARDS.VERSION, card.version)
-            .returningResult()
-    ).map { it.into(Card::class.java) }
+            .returningResult(
+                Tables.CARDS.ID,
+                Tables.CARDS.DECK,
+                Tables.CARDS.ORDINAL,
+                Tables.CARDS.VERSION,
+            )
+    ).map { Card(it) }
 }
