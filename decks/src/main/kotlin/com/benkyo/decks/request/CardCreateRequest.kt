@@ -1,5 +1,10 @@
 package com.benkyo.decks.request
 
+data class CardUpdateRequest(
+    val ordinal: Short? = null,
+    val data: List<CardData>? = null
+)
+
 data class CardCreateRequest(
     val ordinal: Short,
     val data: List<CardData>

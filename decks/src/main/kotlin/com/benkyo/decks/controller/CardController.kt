@@ -3,6 +3,7 @@ package com.benkyo.decks.controller
 import com.benkyo.decks.data.*
 import com.benkyo.decks.repository.*
 import com.benkyo.decks.request.CardCreateRequest
+import com.benkyo.decks.request.CardUpdateRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -63,6 +64,61 @@ class CardController(
         )
     }
 
+    @PatchMapping("/{cardId}")
+    suspend fun updateCard(
+        principal: Principal,
+        exchange: ServerWebExchange,
+        @PathVariable id: String,
+        @PathVariable cardId: String,
+        @RequestBody request: CardUpdateRequest
+    ): Card? {
+        val deck = deckRepository.findById(id)
+
+        if (deck == null) {
+            exchange.response.statusCode = HttpStatus.NOT_FOUND
+            return null
+        }
+
+        if (deck.author != principal.name) {
+            exchange.response.statusCode = HttpStatus.FORBIDDEN
+            return null
+        }
+
+        var card = cardRepository.get(id, cardId).awaitSingle()
+
+        if (card == null) {
+            exchange.response.statusCode = HttpStatus.NOT_FOUND
+            return null
+        }
+
+        // Ensure that all the columns exist first
+        val columnIds = columnRepository.findAllByDeck(id).toList().map { it.id }
+
+        if (request.data != null) {
+            if (request.data.any { it.column !in columnIds }) {
+                exchange.response.statusCode = HttpStatus.BAD_REQUEST
+                return null
+            }
+
+            card = card.copy(data = request.data.map {
+                CardData(
+                    card = card!!.id,
+                    column = it.column,
+                    src = it.src
+                )
+            })
+        }
+
+        if (request.ordinal != null) {
+            card = card.copy(ordinal = request.ordinal)
+        }
+
+        cardRepository.save(card).awaitSingle()
+        cardDataRepository.saveAll(card.data).toList()
+
+        return card
+    }
+
     @PostMapping
     suspend fun createCard(
         principal: Principal,
@@ -73,7 +129,7 @@ class CardController(
         val deck = deckRepository.findById(id)
 
         if (deck == null) {
-            exchange.response.statusCode = HttpStatus.BAD_REQUEST
+            exchange.response.statusCode = HttpStatus.NOT_FOUND
             return null
         }
 
@@ -119,7 +175,7 @@ class CardController(
         val deck = deckRepository.findById(id)
 
         if (deck == null) {
-            exchange.response.statusCode = HttpStatus.BAD_REQUEST
+            exchange.response.statusCode = HttpStatus.NOT_FOUND
             return
         }
 
