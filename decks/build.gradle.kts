@@ -26,6 +26,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("com.auth0:java-jwt:3.19.0")
     implementation("com.auth0:jwks-rsa:0.21.0")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
 
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("org.postgresql:postgresql")

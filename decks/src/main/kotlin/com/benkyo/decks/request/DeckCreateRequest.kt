@@ -16,8 +16,8 @@ data class DeckCreateRequest(
     val description: String,
     @field:NotBlank
     @field:Size(min = 5, max = 5)
-    val sourceLanguage: String, // TODO: Check if actual language code
+    val sourceLanguage: String,
     @field:NotBlank
     @field:Size(min = 5, max = 5)
-    val targetLanguage: String // TODO: Check if actual language code
+    val targetLanguage: String
 )

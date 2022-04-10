@@ -4,6 +4,7 @@ import com.benkyo.decks.data.Deck
 import com.benkyo.decks.repository.DeckRepository
 import com.benkyo.decks.repository.UserRepository
 import com.benkyo.decks.request.DeckCreateRequest
+import com.benkyo.decks.utils.isValidLocaleCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import org.springframework.http.HttpStatus
@@ -33,6 +34,18 @@ class DeckController(
     ): Deck? {
         if (userRepository.findById(principal.name) == null) {
             exchange.response.statusCode = HttpStatus.UNAUTHORIZED
+            return null
+        }
+
+        // TODO: We're really going to want to provide more context for these errors
+
+        if (!request.sourceLanguage.isValidLocaleCode()) {
+            exchange.response.statusCode = HttpStatus.BAD_REQUEST
+            return null
+        }
+
+        if (!request.targetLanguage.isValidLocaleCode()) {
+            exchange.response.statusCode = HttpStatus.BAD_REQUEST
             return null
         }
 
@@ -76,6 +89,18 @@ class DeckController(
 
         if (deck.author != user.id) {
             exchange.response.statusCode = HttpStatus.FORBIDDEN
+            return null
+        }
+
+        // TODO: We're really going to want to provide more context for these errors
+
+        if (!request.sourceLanguage.isValidLocaleCode()) {
+            exchange.response.statusCode = HttpStatus.BAD_REQUEST
+            return null
+        }
+
+        if (!request.targetLanguage.isValidLocaleCode()) {
+            exchange.response.statusCode = HttpStatus.BAD_REQUEST
             return null
         }
 
