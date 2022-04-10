@@ -31,6 +31,7 @@ class CardController(
         @PathVariable id: String
     ): CardsWithData? = coroutineScope {
         val deck = deckRepository.findById(id)
+
         if (deck == null || (deck.isPrivate && deck.author == principal.name)) {
             exchange.response.statusCode = HttpStatus.NOT_FOUND
             return@coroutineScope null
@@ -45,6 +46,8 @@ class CardController(
         }.await()
 
         val awaitedColumns = columns.await()
+
+
         return@coroutineScope CardsWithData(
             awaitedColumns,
             cards.map { card ->

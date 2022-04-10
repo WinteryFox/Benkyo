@@ -16,19 +16,20 @@ class DeckTest(
 ) {
     @Test
     suspend fun testCardRepository() {
-        // TODO
+        // TODO Not sure what needs doing here? -- Gareth
+
         val deck = Deck(
-            "0",
-            "0",
-            false,
-            "Test Deck",
-            "This is a test description.",
-            "This is a longer description supporting **Markdown**",
-            "en-US",
-            "ja-JP",
-            LocalDateTime.now(),
-            null,
-            0
+            author = "0",
+            createdAt = LocalDateTime.now(),
+            description = "This is a longer description supporting **Markdown**",
+            id = "0",
+            imageHash = null,
+            isPrivate = false,
+            name = "Test Deck",
+            shortDescription = "This is a test description.",
+            sourceLanguage = "en-US",
+            targetLanguage = "ja-JP",
+            version = 0
         )
 
         Mockito.`when`(repository.save(deck)).thenReturn(null)
