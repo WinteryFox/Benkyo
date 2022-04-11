@@ -1,6 +1,9 @@
 package com.benkyo.decks.controller
 
 import com.benkyo.decks.data.Deck
+import com.benkyo.decks.exceptions.DeckNotFoundException
+import com.benkyo.decks.exceptions.InvalidLocaleException
+import com.benkyo.decks.exceptions.UnauthorizedException
 import com.benkyo.decks.repository.DeckRepository
 import com.benkyo.decks.repository.UserRepository
 import com.benkyo.decks.request.DeckCreateRequest
@@ -32,21 +35,15 @@ class DeckController(
         principal: Principal,
         @Valid @RequestBody request: DeckCreateRequest
     ): Deck? {
-        if (userRepository.findById(principal.name) == null) {
-            exchange.response.statusCode = HttpStatus.UNAUTHORIZED
-            return null
-        }
-
-        // TODO: We're really going to want to provide more context for these errors
+        userRepository.findById(principal.name)
+            ?: throw UnauthorizedException()
 
         if (!request.sourceLanguage.isValidLocaleCode()) {
-            exchange.response.statusCode = HttpStatus.BAD_REQUEST
-            return null
+            throw InvalidLocaleException(request.sourceLanguage)
         }
 
         if (!request.targetLanguage.isValidLocaleCode()) {
-            exchange.response.statusCode = HttpStatus.BAD_REQUEST
-            return null
+            throw InvalidLocaleException(request.targetLanguage)
         }
 
         return deckRepository.save(
@@ -74,34 +71,22 @@ class DeckController(
         @Valid @RequestBody request: DeckCreateRequest
     ): Deck? {
         val user = userRepository.findById(principal.name)
-
-        if (user == null) {
-            exchange.response.statusCode = HttpStatus.UNAUTHORIZED
-            return null
-        }
+            ?: throw UnauthorizedException()
 
         val deck = deckRepository.findById(id)
 
-        if (deck == null) {
-            exchange.response.statusCode = HttpStatus.BAD_REQUEST
-            return null
-        }
+        if (deck == null || deck.author != user.id) {
+            // TODO: See TODO in CardController about status codes
 
-        if (deck.author != user.id) {
-            exchange.response.statusCode = HttpStatus.FORBIDDEN
-            return null
+            throw DeckNotFoundException(id)
         }
-
-        // TODO: We're really going to want to provide more context for these errors
 
         if (!request.sourceLanguage.isValidLocaleCode()) {
-            exchange.response.statusCode = HttpStatus.BAD_REQUEST
-            return null
+            throw InvalidLocaleException(request.sourceLanguage)
         }
 
         if (!request.targetLanguage.isValidLocaleCode()) {
-            exchange.response.statusCode = HttpStatus.BAD_REQUEST
-            return null
+            throw InvalidLocaleException(request.targetLanguage)
         }
 
         return deckRepository.save(
@@ -134,17 +119,12 @@ class DeckController(
 
         val deck = deckRepository.findById(id)
 
-        if (deck == null) {
-            exchange.response.statusCode = HttpStatus.BAD_REQUEST
-            return
+        if (deck == null || deck.author != user.id) {
+            // TODO: See TODO in CardController about status codes
+
+            throw DeckNotFoundException(id)
         }
 
-        if (deck.author != user.id) {
-            exchange.response.statusCode = HttpStatus.FORBIDDEN
-            return
-        }
-
-        // NOTE: Answers and cards should be deleted via cascading automatically
         deckRepository.deleteById(id)
     }
 }

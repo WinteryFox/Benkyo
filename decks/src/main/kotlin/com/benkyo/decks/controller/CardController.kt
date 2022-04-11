@@ -1,6 +1,9 @@
 package com.benkyo.decks.controller
 
 import com.benkyo.decks.data.*
+import com.benkyo.decks.exceptions.CardNotFoundException
+import com.benkyo.decks.exceptions.ColumnsNotFound
+import com.benkyo.decks.exceptions.DeckNotFoundException
 import com.benkyo.decks.repository.*
 import com.benkyo.decks.request.CardCreateRequest
 import com.benkyo.decks.request.CardUpdateRequest
@@ -9,7 +12,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.awaitSingle
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
 import java.security.Principal
@@ -33,8 +35,12 @@ class CardController(
         val deck = deckRepository.findById(id)
 
         if (deck == null || (deck.isPrivate && deck.author == principal.name)) {
-            exchange.response.statusCode = HttpStatus.NOT_FOUND
-            return@coroutineScope null
+            // TODO: Consider HTTP status code
+            // For consistency, this always returns a Not Found if the deck exists, but the user can't access it.
+            // We should consider whether we prefer this, or we'd rather respond with Forbidden and leak that the
+            // deck exists.
+
+            throw DeckNotFoundException(id)
         }
 
         val columns = async(Dispatchers.IO) {
@@ -46,7 +52,6 @@ class CardController(
         }.await()
 
         val awaitedColumns = columns.await()
-
 
         return@coroutineScope CardsWithData(
             awaitedColumns,
@@ -77,30 +82,26 @@ class CardController(
     ): Card? {
         val deck = deckRepository.findById(id)
 
-        if (deck == null) {
-            exchange.response.statusCode = HttpStatus.NOT_FOUND
-            return null
-        }
-
-        if (deck.author != principal.name) {
-            exchange.response.statusCode = HttpStatus.FORBIDDEN
-            return null
+        if (deck == null || (deck.isPrivate && deck.author == principal.name)) {
+            throw DeckNotFoundException(id)
         }
 
         var card = cardRepository.get(id, cardId).awaitSingle()
 
         if (card == null) {
-            exchange.response.statusCode = HttpStatus.NOT_FOUND
-            return null
+            throw CardNotFoundException(cardId)
         }
 
         // Ensure that all the columns exist first
         val columnIds = columnRepository.findAllByDeck(id).toList().map { it.id }
 
         if (request.data != null) {
-            if (request.data.any { it.column !in columnIds }) {
-                exchange.response.statusCode = HttpStatus.BAD_REQUEST
-                return null
+            val unknownColumns = request.data
+                .filter { it.column !in columnIds }
+                .map { it.column }
+
+            if (unknownColumns.isNotEmpty()) {
+                throw ColumnsNotFound(unknownColumns.toTypedArray())
             }
 
             card = card.copy(data = request.data.map {
@@ -131,22 +132,19 @@ class CardController(
     ): Card? {
         val deck = deckRepository.findById(id)
 
-        if (deck == null) {
-            exchange.response.statusCode = HttpStatus.NOT_FOUND
-            return null
-        }
-
-        if (deck.author != principal.name) {
-            exchange.response.statusCode = HttpStatus.FORBIDDEN
-            return null
+        if (deck == null || (deck.isPrivate && deck.author == principal.name)) {
+            throw DeckNotFoundException(id)
         }
 
         // Ensure that all the columns exist first
         val columnIds = columnRepository.findAllByDeck(id).toList().map { it.id }
 
-        if (request.data.any { it.column !in columnIds }) {
-            exchange.response.statusCode = HttpStatus.BAD_REQUEST
-            return null
+        val unknownColumns = request.data
+            .filter { it.column !in columnIds }
+            .map { it.column }
+
+        if (unknownColumns.isNotEmpty()) {
+            throw ColumnsNotFound(unknownColumns.toTypedArray())
         }
 
         val card = cardRepository.save(
@@ -177,14 +175,8 @@ class CardController(
     ) {
         val deck = deckRepository.findById(id)
 
-        if (deck == null) {
-            exchange.response.statusCode = HttpStatus.NOT_FOUND
-            return
-        }
-
-        if (deck.author != principal.name) {
-            exchange.response.statusCode = HttpStatus.FORBIDDEN
-            return
+        if (deck == null || (deck.isPrivate && deck.author == principal.name)) {
+            throw DeckNotFoundException(id)
         }
 
         answerRepository.deleteAllByCard(card)
