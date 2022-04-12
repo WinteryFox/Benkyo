@@ -50,6 +50,7 @@ class Config(
             .httpBasic().disable()
             .authorizeExchange()
             .pathMatchers(HttpMethod.GET, "/decks/**").permitAll()
+            .pathMatchers(HttpMethod.GET, "/languages").permitAll()
             .anyExchange().authenticated().and()
             .build()
 }
