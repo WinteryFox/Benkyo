@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 
+private const val prefix = "Bearer "
+
 @Component
 class SecurityContextRepository(
     val authenticationManager: ReactiveAuthenticationManager
@@ -21,15 +23,15 @@ class SecurityContextRepository(
 
     override fun load(exchange: ServerWebExchange): Mono<SecurityContext> = mono {
         val header = exchange.request.headers.getFirst(HttpHeaders.AUTHORIZATION) ?: return@mono null
-        if (!header.startsWith("Bearer "))
+        if (!header.startsWith(prefix))
             return@mono null
 
-        val token = header.substring(7)
+        val token = header.substring(prefix.length)
 
         return@mono SecurityContextImpl(
             authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(
-                    token,
+                    null,
                     token
                 )
             ).awaitSingleOrNull() ?: return@mono null

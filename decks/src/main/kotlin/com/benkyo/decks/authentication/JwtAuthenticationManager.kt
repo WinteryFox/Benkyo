@@ -3,7 +3,8 @@ package com.benkyo.decks.authentication
 import com.auth0.jwk.UrlJwkProvider
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.exceptions.TokenExpiredException
+import com.auth0.jwt.exceptions.JWTDecodeException
+import com.auth0.jwt.exceptions.JWTVerificationException
 import kotlinx.coroutines.reactor.mono
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -19,29 +20,34 @@ import java.security.spec.X509EncodedKeySpec
 class JwtAuthenticationManager : ReactiveAuthenticationManager {
     private val provider =
         UrlJwkProvider(URL("https://cognito-idp.us-east-2.amazonaws.com/us-east-2_3MQKXi2A6/.well-known/jwks.json"))
-    private val jwt = JWT()
+    private val client = JWT()
     private val keyFactory = KeyFactory.getInstance("RSA")
+    private val verifiers = provider.all.associate {
+        it.id to
+            JWT.require(
+                Algorithm.RSA256(
+                    keyFactory.generatePublic(X509EncodedKeySpec(it.publicKey.encoded)) as RSAPublicKey,
+                    null
+                )
+            ).build()
+    }
 
     override fun authenticate(authentication: Authentication): Mono<Authentication> = mono {
-        val jwt = jwt.decodeJwt(authentication.credentials.toString())
-        val jwk = provider.all.firstOrNull { it.id == jwt.keyId && it.algorithm == jwt.algorithm && it.algorithm == "RS256" }
-            ?: return@mono null
-        val verifier = JWT.require(
-            Algorithm.RSA256(
-                keyFactory.generatePublic(X509EncodedKeySpec(jwk.publicKey.encoded)) as RSAPublicKey,
-                null
-            )
-        ).build()
         try {
-            verifier.verify(authentication.credentials.toString())
-        } catch (exception: TokenExpiredException) {
+            val jwt =
+                verifiers[client.decodeJwt(authentication.credentials.toString()).id]
+                    ?.verify(authentication.credentials.toString())
+                    ?: return@mono null
+
+            return@mono UsernamePasswordAuthenticationToken(
+                jwt.subject,
+                null,
+                emptyList()
+            )
+        } catch (exception: JWTVerificationException) {
+            return@mono null
+        } catch (exception: JWTDecodeException) {
             return@mono null
         }
-
-        return@mono UsernamePasswordAuthenticationToken(
-            jwt.subject,
-            null,
-            emptyList()
-        )
     }
 }
