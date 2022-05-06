@@ -38,13 +38,10 @@ class DeckController(
         userRepository.findById(principal.name)
             ?: throw UnauthorizedException()
 
-        if (!request.sourceLanguage.isValidLocaleCode()) {
+        if (!request.sourceLanguage.isValidLocaleCode())
             throw InvalidLocaleException(request.sourceLanguage)
-        }
-
-        if (!request.targetLanguage.isValidLocaleCode()) {
+        if (!request.targetLanguage.isValidLocaleCode())
             throw InvalidLocaleException(request.targetLanguage)
-        }
 
         return deckRepository.save(
             Deck(

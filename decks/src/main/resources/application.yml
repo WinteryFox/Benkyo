@@ -13,7 +13,8 @@ spring:
 
 logging:
   level:
-    #    io.r2dbc.postgresql: DEBUG # for the driver
-    io.r2dbc.postgresql.QUERY: DEBUG # for queries
-    io.r2dbc.postgresql.PARAM: DEBUG # for parameters
-    #    io.r2dbc.postgresql.client: DEBUG # for the client
+    root: INFO
+    # io.r2dbc.postgresql: DEBUG # for the driver
+    # io.r2dbc.postgresql.QUERY: DEBUG # for queries
+    # io.r2dbc.postgresql.PARAM: DEBUG # for parameters
+    # io.r2dbc.postgresql.client: DEBUG # for the client

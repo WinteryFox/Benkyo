@@ -35,7 +35,7 @@ class JwtAuthenticationManager : ReactiveAuthenticationManager {
     override fun authenticate(authentication: Authentication): Mono<Authentication> = mono {
         try {
             val jwt =
-                verifiers[client.decodeJwt(authentication.credentials.toString()).id]
+                verifiers[client.decodeJwt(authentication.credentials.toString()).keyId]
                     ?.verify(authentication.credentials.toString())
                     ?: return@mono null
 

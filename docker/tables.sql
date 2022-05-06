@@ -16,10 +16,11 @@ CREATE TABLE decks
     description       TEXT                        NOT NULL,
     source_language   VARCHAR(5)                  NOT NULL,
     target_language   VARCHAR(5)                  NOT NULL,
-    image_hash        TEXT                        DEFAULT NULL,
+    image_hash        TEXT                                 DEFAULT NULL,
+    tags              TEXT[]                      NOT NULL,
     version           INT                         NOT NULL,
 
-    FOREIGN KEY (author) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (author) REFERENCES users (id) ON DELETE SET NULL
 );
 
 CREATE TABLE columns
@@ -30,13 +31,9 @@ CREATE TABLE columns
     ordinal SMALLINT NOT NULL,
     version INT      NOT NULL,
 
-    FOREIGN KEY (deck) REFERENCES decks(id) ON DELETE CASCADE
+    FOREIGN KEY (deck) REFERENCES decks (id) ON DELETE CASCADE
 );
 
--- TODO: Constraint on maximum number of cards
--- From Gareth: We can probably easily do this on the application level, doing it on the database side would require
--- a complex postgres trigger which would be a real pain to maintain, and would likely just be slower than doing it
--- ourselves on top of that.
 CREATE TABLE cards
 (
     id      TEXT PRIMARY KEY,
@@ -44,7 +41,7 @@ CREATE TABLE cards
     ordinal SMALLINT NOT NULL,
     version INT      NOT NULL,
 
-    FOREIGN KEY (deck) REFERENCES decks(id) ON DELETE CASCADE
+    FOREIGN KEY (deck) REFERENCES decks (id) ON DELETE CASCADE
 );
 
 CREATE TABLE card_data
@@ -56,10 +53,10 @@ CREATE TABLE card_data
 
     PRIMARY KEY (card, "column"),
 
-    FOREIGN KEY (card)     REFERENCES cards(id)   ON DELETE CASCADE,
-    FOREIGN KEY ("column") REFERENCES columns(id) ON DELETE CASCADE,
+    FOREIGN KEY (card) REFERENCES cards (id) ON DELETE CASCADE,
+    FOREIGN KEY ("column") REFERENCES columns (id) ON DELETE CASCADE,
 
-    CONSTRAINT fk_card FOREIGN KEY (card) REFERENCES cards(id)
+    CONSTRAINT fk_card FOREIGN KEY (card) REFERENCES cards (id)
 );
 
 CREATE TABLE attachments
@@ -78,8 +75,8 @@ CREATE TABLE card_attachments
 
     PRIMARY KEY (attachment, card),
 
-    FOREIGN KEY (attachment) REFERENCES attachments(id) ON DELETE CASCADE,
-    FOREIGN KEY (card)       REFERENCES cards(id)       ON DELETE CASCADE
+    FOREIGN KEY (attachment) REFERENCES attachments (id) ON DELETE CASCADE,
+    FOREIGN KEY (card) REFERENCES cards (id) ON DELETE CASCADE
 );
 
 CREATE TABLE ignored_card
@@ -89,8 +86,8 @@ CREATE TABLE ignored_card
 
     PRIMARY KEY (card, "user"),
 
-    FOREIGN KEY (card)   REFERENCES cards(id) ON DELETE CASCADE,
-    FOREIGN KEY ("user") REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (card) REFERENCES cards (id) ON DELETE CASCADE,
+    FOREIGN KEY ("user") REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE card_progress
@@ -101,6 +98,6 @@ CREATE TABLE card_progress
 
     PRIMARY KEY (card, "user", reviewed_date),
 
-    FOREIGN KEY (card)   REFERENCES cards(id) ON DELETE CASCADE,
-    FOREIGN KEY ("user") REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (card) REFERENCES cards (id) ON DELETE CASCADE,
+    FOREIGN KEY ("user") REFERENCES users (id) ON DELETE CASCADE
 );

@@ -7,9 +7,7 @@ import com.benkyo.decks.exceptions.DeckNotFoundException
 import com.benkyo.decks.repository.*
 import com.benkyo.decks.request.CardCreateRequest
 import com.benkyo.decks.request.CardUpdateRequest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.web.bind.annotation.*
@@ -34,7 +32,7 @@ class CardController(
     ): CardsWithData? = coroutineScope {
         val deck = deckRepository.findById(id)
 
-        if (deck == null || (deck.isPrivate && deck.author == principal.name)) {
+        if (deck == null || (deck.isPrivate && deck.author != principal.name)) {
             // TODO: Consider HTTP status code
             // For consistency, this always returns a Not Found if the deck exists, but the user can't access it.
             // We should consider whether we prefer this, or we'd rather respond with Forbidden and leak that the
@@ -49,26 +47,24 @@ class CardController(
 
         val cards = async(Dispatchers.IO) {
             cardRepository.findAllByDeck(id).toList()
-        }.await()
-
-        val awaitedColumns = columns.await()
+        }
 
         return@coroutineScope CardsWithData(
-            awaitedColumns,
-            cards.map { card ->
+            columns.await(),
+            cards.await().map { card ->
                 CardWithDataOrdinal(
                     card.id,
                     card.ordinal,
                     card.data.map { data ->
                         CardDataWithOrdinal(
                             data.column,
-                            awaitedColumns.find { data.column == it.id }!!.ordinal,
+                            columns.await().find { data.column == it.id }!!.ordinal,
                             data.src
                         )
                     },
                     card.attachments
                 )
-            }.toList()
+            }
         )
     }
 
@@ -81,16 +77,10 @@ class CardController(
         @RequestBody request: CardUpdateRequest
     ): Card? {
         val deck = deckRepository.findById(id)
-
-        if (deck == null || (deck.isPrivate && deck.author == principal.name)) {
+        if (deck == null || (deck.isPrivate && deck.author != principal.name))
             throw DeckNotFoundException(id)
-        }
 
-        var card = cardRepository.get(id, cardId).awaitSingle()
-
-        if (card == null) {
-            throw CardNotFoundException(cardId)
-        }
+        var card = cardRepository.get(id, cardId).awaitSingle() ?: throw CardNotFoundException(cardId)
 
         // Ensure that all the columns exist first
         val columnIds = columnRepository.findAllByDeck(id).toList().map { it.id }
@@ -106,7 +96,7 @@ class CardController(
 
             card = card.copy(data = request.data.map {
                 CardData(
-                    card = card!!.id,
+                    card = card.id,
                     column = it.column,
                     src = it.src
                 )
@@ -132,7 +122,7 @@ class CardController(
     ): Card? {
         val deck = deckRepository.findById(id)
 
-        if (deck == null || (deck.isPrivate && deck.author == principal.name)) {
+        if (deck == null || (deck.isPrivate && deck.author != principal.name)) {
             throw DeckNotFoundException(id)
         }
 
@@ -175,7 +165,7 @@ class CardController(
     ) {
         val deck = deckRepository.findById(id)
 
-        if (deck == null || (deck.isPrivate && deck.author == principal.name)) {
+        if (deck == null || (deck.isPrivate && deck.author != principal.name)) {
             throw DeckNotFoundException(id)
         }
 

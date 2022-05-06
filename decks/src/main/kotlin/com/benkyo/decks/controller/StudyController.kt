@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.*
 class StudyController(
     private val deckRepository: DeckRepository
 ) {
-   /* @GetMapping
-    fun getNew(principal: Principal, @PathVariable deck: String): Flux<CardWithAnswers> =
+    /*@GetMapping
+    fun getNew(
+        principal: Principal,
+        @PathVariable deck: String
+    ): Flow<> =
         deckRepository.findNewCardsByDeckAndUser(deck, principal.name)*/
 }
