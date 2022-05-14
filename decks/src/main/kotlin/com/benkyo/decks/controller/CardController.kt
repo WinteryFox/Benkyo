@@ -62,7 +62,8 @@ class CardController(
                             data.src
                         )
                     },
-                    card.attachments
+                    card.attachments,
+                    card.tags
                 )
             }
         )
@@ -94,13 +95,17 @@ class CardController(
                 throw ColumnsNotFound(unknownColumns.toTypedArray())
             }
 
-            card = card.copy(data = request.data.map {
-                CardData(
-                    card = card.id,
-                    column = it.column,
-                    src = it.src
-                )
-            })
+            card = card.copy(
+                data = request.data.map {
+                    CardData(
+                        card = card.id,
+                        column = it.column,
+                        src = it.src,
+                    )
+                },
+
+                tags = request.tags
+            )
         }
 
         if (request.ordinal != null) {
@@ -141,7 +146,8 @@ class CardController(
             Card(
                 id = UUID.randomUUID().toString(),
                 deck = id,
-                ordinal = request.ordinal
+                ordinal = request.ordinal,
+                tags = request.tags,
             )
         ).awaitSingle()
 

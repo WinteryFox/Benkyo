@@ -37,6 +37,7 @@ class CardRepository(val dsl: DSLContext) {
                 Tables.CARDS.DECK,
                 Tables.CARDS.ORDINAL,
                 Tables.CARDS.VERSION,
+                Tables.CARDS.TAGS,
 
                 // Select the card data and add it to the Card object under the `data` prop
                 DSL.multiset(

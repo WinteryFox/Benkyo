@@ -11,6 +11,7 @@ data class CardData(
     val card: String,
     val column: String,
     val src: List<String>,
+
     @JsonIgnore
-    val version: Int = 0
+    val version: Int = 0,
 )

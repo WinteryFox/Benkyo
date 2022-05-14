@@ -46,16 +46,17 @@ class DeckController(
 
         return deckRepository.save(
             Deck(
-                UUID.randomUUID().toString(),
-                principal.name,
-                request.isPrivate,
-                LocalDateTime.now(),
-                request.name,
-                request.shortDescription,
-                request.description,
-                request.sourceLanguage,
-                request.targetLanguage,
-                null
+                id = UUID.randomUUID().toString(),
+                author = principal.name,
+                isPrivate = request.isPrivate,
+                createdAt = LocalDateTime.now(),
+                name = request.name,
+                shortDescription = request.shortDescription,
+                description = request.description,
+                sourceLanguage = request.sourceLanguage,
+                targetLanguage = request.targetLanguage,
+                imageHash = null,
+                tags = request.tags
             )
         )
     }
@@ -89,7 +90,8 @@ class DeckController(
                 name = request.name ?: deck.name,
                 shortDescription = request.shortDescription ?: deck.shortDescription,
                 sourceLanguage = request.sourceLanguage ?: deck.sourceLanguage,
-                targetLanguage = request.targetLanguage ?: deck.targetLanguage
+                targetLanguage = request.targetLanguage ?: deck.targetLanguage,
+                tags = request.tags
             )
         )
     }
