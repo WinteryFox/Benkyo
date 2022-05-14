@@ -107,7 +107,17 @@ CREATE TABLE card_progress
     FOREIGN KEY ("user") REFERENCES users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE tags
+-- These tables both need insert, delete and update
+
+CREATE TABLE card_tags
+(
+    tag    TEXT    NOT NULL,
+    count  BIGINT  NOT NULL DEFAULT 1,
+
+    PRIMARY KEY (tag)
+)
+
+CREATE TABLE deck_tags
 (
     tag    TEXT    NOT NULL,
     count  BIGINT  NOT NULL DEFAULT 1,
