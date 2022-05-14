@@ -115,7 +115,7 @@ CREATE TABLE card_tags
     count  BIGINT  NOT NULL DEFAULT 1,
 
     PRIMARY KEY (tag)
-)
+);
 
 CREATE TABLE deck_tags
 (
@@ -123,4 +123,4 @@ CREATE TABLE deck_tags
     count  BIGINT  NOT NULL DEFAULT 1,
 
     PRIMARY KEY (tag)
-)
+);
