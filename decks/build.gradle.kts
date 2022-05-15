@@ -30,6 +30,7 @@ dependencies {
     implementation("com.ibm.icu:icu4j:71.1")
     implementation("com.ibm.icu:icu4j-charset:71.1")
     implementation("com.ibm.icu:icu4j-localespi:71.1")
+    implementation("aws.sdk.kotlin:s3:0.15.0")
 
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("org.postgresql:postgresql")

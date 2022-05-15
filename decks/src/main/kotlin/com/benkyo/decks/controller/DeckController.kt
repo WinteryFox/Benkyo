@@ -8,6 +8,7 @@ import com.benkyo.decks.repository.DeckRepository
 import com.benkyo.decks.repository.UserRepository
 import com.benkyo.decks.request.DeckCreateRequest
 import com.benkyo.decks.request.DeckPatchRequest
+import com.benkyo.decks.service.BucketService
 import com.benkyo.decks.utils.isValidLocaleCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -25,6 +26,7 @@ import javax.validation.Valid
 class DeckController(
     private val userRepository: UserRepository,
     private val deckRepository: DeckRepository,
+    private val bucket: BucketService
 ) {
     @GetMapping
     suspend fun getDecks(): Flow<Deck> = deckRepository.findAll().filter { !it.isPrivate }

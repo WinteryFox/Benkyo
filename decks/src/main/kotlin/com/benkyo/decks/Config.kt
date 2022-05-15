@@ -51,6 +51,7 @@ class Config(
             .authorizeExchange()
             .pathMatchers(HttpMethod.GET, "/decks/**").permitAll()
             .pathMatchers(HttpMethod.GET, "/languages").permitAll()
+            .pathMatchers(HttpMethod.GET, "/assets/**").permitAll()
             .pathMatchers(HttpMethod.POST, "/register").permitAll() // TODO: TEMPORARY
             .anyExchange().authenticated().and()
             .build()

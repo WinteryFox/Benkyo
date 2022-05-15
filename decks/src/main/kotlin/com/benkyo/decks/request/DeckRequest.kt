@@ -33,5 +33,6 @@ data class DeckPatchRequest(
     @field:Size(min = 5, max = 5)
     val sourceLanguage: String? = null,
     @field:Size(min = 5, max = 5)
-    val targetLanguage: String? = null
+    val targetLanguage: String? = null,
+    val image: String? = null
 )
