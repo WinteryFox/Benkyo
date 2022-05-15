@@ -19,7 +19,9 @@ data class DeckCreateRequest(
     val sourceLanguage: String,
     @field:NotBlank
     @field:Size(min = 5, max = 5)
-    val targetLanguage: String
+    val targetLanguage: String,
+
+    val tags: Array<String> = emptyArray(),
 )
 
 data class DeckPatchRequest(
@@ -34,5 +36,7 @@ data class DeckPatchRequest(
     val sourceLanguage: String? = null,
     @field:Size(min = 5, max = 5)
     val targetLanguage: String? = null,
-    val image: String? = null
+    val image: String? = null,
+
+    val tags: Array<String> = emptyArray(),
 )

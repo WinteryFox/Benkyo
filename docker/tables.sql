@@ -17,11 +17,13 @@ CREATE TABLE decks
     source_language   VARCHAR(5)                  NOT NULL,
     target_language   VARCHAR(5)                  NOT NULL,
     image_hash        TEXT                                 DEFAULT NULL,
-    tags              TEXT[]                      NOT NULL,
+    tags              TEXT[]                      NOT NULL DEFAULT '{}',
     version           INT                         NOT NULL,
 
     FOREIGN KEY (author) REFERENCES users (id) ON DELETE SET NULL
 );
+
+CREATE INDEX decks_tags ON decks USING gin(tags);
 
 CREATE TABLE columns
 (
@@ -40,9 +42,12 @@ CREATE TABLE cards
     deck    TEXT,
     ordinal SMALLINT NOT NULL,
     version INT      NOT NULL,
+    tags    TEXT[]   NOT NULL DEFAULT '{}',
 
     FOREIGN KEY (deck) REFERENCES decks (id) ON DELETE CASCADE
 );
+
+CREATE INDEX cards_tags ON cards USING gin(tags);
 
 CREATE TABLE card_data
 (
@@ -100,4 +105,22 @@ CREATE TABLE card_progress
 
     FOREIGN KEY (card) REFERENCES cards (id) ON DELETE CASCADE,
     FOREIGN KEY ("user") REFERENCES users (id) ON DELETE CASCADE
+);
+
+-- These tables both need insert, delete and update
+
+CREATE TABLE card_tags
+(
+    tag    TEXT    NOT NULL,
+    count  BIGINT  NOT NULL DEFAULT 1,
+
+    PRIMARY KEY (tag)
+);
+
+CREATE TABLE deck_tags
+(
+    tag    TEXT    NOT NULL,
+    count  BIGINT  NOT NULL DEFAULT 1,
+
+    PRIMARY KEY (tag)
 );
