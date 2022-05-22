@@ -24,13 +24,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    implementation("com.auth0:java-jwt:3.19.1")
+    implementation("com.auth0:java-jwt:3.19.2")
     implementation("com.auth0:jwks-rsa:0.21.1")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("com.ibm.icu:icu4j:71.1")
     implementation("com.ibm.icu:icu4j-charset:71.1")
     implementation("com.ibm.icu:icu4j-localespi:71.1")
-    implementation("aws.sdk.kotlin:s3:0.15.0")
+    implementation("software.amazon.awssdk:s3:2.17.194")
 
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("org.postgresql:postgresql")
@@ -40,7 +40,7 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
 
-    jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
+    jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0")
     jooqGenerator("org.postgresql:postgresql")
 }
 

@@ -1,36 +1,45 @@
 package com.benkyo.decks.service
 
-import aws.sdk.kotlin.services.s3.S3Client
-import aws.sdk.kotlin.services.s3.model.GetObjectRequest
-import aws.sdk.kotlin.services.s3.model.GetObjectResponse
-import aws.sdk.kotlin.services.s3.model.PutObjectRequest
-import aws.smithy.kotlin.runtime.content.ByteStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
-
-const val BUCKET = "app-benkyo"
-const val REGION = "eu-central-1"
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
+import software.amazon.awssdk.services.s3.model.GetObjectResponse
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
 @Service
-class BucketService {
-    private val client = S3Client {
-        region = REGION
-    }
+class BucketService(
+    region: Region = Region.EU_CENTRAL_1,
+    private val bucket: String = "app-benkyo"
+) {
+    private val client = S3Client.builder()
+        .region(region)
+        .build()
 
-    suspend fun <T> getObject(
+    // TODO: This eats exceptions regardless of what type they were, should probably eat only 404's
+    suspend fun <T> get(
         key: String,
-        transform: suspend (response: GetObjectResponse) -> T
-    ): T = client.getObject(GetObjectRequest {
-        this.key = key
-        this.bucket = BUCKET
-    }) {
-        transform(it)
+        bucket: String = this.bucket,
+        transform: (data: ByteArray?, response: GetObjectResponse?) -> T?
+    ): T? {
+        val res = runCatching {
+            client.getObject(GetObjectRequest.builder().bucket(bucket).key(key).build())
+        }.getOrNull()
+
+        return transform(
+            withContext(Dispatchers.IO) {
+                res?.readAllBytes()
+            },
+            res?.response()
+        )
     }
 
-    suspend fun putObject(key: String, body: ByteStream) {
-        client.putObject {
-            this.key = key
-            this.bucket = BUCKET
-            this.body = body
-        }
-    }
+    suspend fun put(
+        key: String,
+        data: ByteArray,
+        bucket: String = this.bucket
+    ) = client.putObject(PutObjectRequest.builder().bucket(bucket).key(key).build(), RequestBody.fromBytes(data))
 }
