@@ -6,9 +6,7 @@ import org.springframework.stereotype.Service
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.GetObjectRequest
-import software.amazon.awssdk.services.s3.model.GetObjectResponse
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.model.*
 
 @Service
 class BucketService(
@@ -19,22 +17,22 @@ class BucketService(
         .region(region)
         .build()
 
-    // TODO: This eats exceptions regardless of what type they were, should probably eat only 404's
     suspend fun <T> get(
         key: String,
         bucket: String = this.bucket,
         transform: (data: ByteArray?, response: GetObjectResponse?) -> T?
-    ): T? {
-        val res = runCatching {
-            client.getObject(GetObjectRequest.builder().bucket(bucket).key(key).build())
-        }.getOrNull()
-
-        return transform(
+    ): T? = try {
+        val o = client.getObject(GetObjectRequest.builder().bucket(bucket).key(key).build())
+        transform(
             withContext(Dispatchers.IO) {
-                res?.readAllBytes()
+                o.readAllBytes()
             },
-            res?.response()
+            o.response()
         )
+    } catch (_: NoSuchKeyException) {
+        transform(null, null)
+    } catch (e: S3Exception) {
+        throw e
     }
 
     suspend fun put(

@@ -20,7 +20,6 @@ class BucketController(
     ): ByteArray? = bucket.get(asset) { data, response ->
         if (data == null || response == null) {
             exchange.response.statusCode = HttpStatus.NOT_FOUND
-            println("hello")
             return@get null
         }
 
