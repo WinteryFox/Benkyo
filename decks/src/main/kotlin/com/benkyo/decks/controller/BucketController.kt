@@ -17,7 +17,7 @@ class BucketController(
     suspend fun getDeckImage(
         exchange: ServerWebExchange,
         @PathVariable asset: String
-    ): ByteArray? = bucket.get(asset) { data, response ->
+    ): ByteArray? = bucket.get("decks/$asset") { data, response ->
         if (data == null || response == null) {
             exchange.response.statusCode = HttpStatus.NOT_FOUND
             return@get null

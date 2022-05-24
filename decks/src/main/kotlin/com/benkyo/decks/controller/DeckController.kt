@@ -1,24 +1,29 @@
 package com.benkyo.decks.controller
 
 import com.benkyo.decks.data.Deck
-import com.benkyo.decks.exceptions.DeckNotFoundException
-import com.benkyo.decks.exceptions.InvalidLocaleException
-import com.benkyo.decks.exceptions.UnauthorizedException
+import com.benkyo.decks.exceptions.*
 import com.benkyo.decks.repository.DeckRepository
 import com.benkyo.decks.repository.UserRepository
 import com.benkyo.decks.request.DeckCreateRequest
 import com.benkyo.decks.request.DeckPatchRequest
 import com.benkyo.decks.service.BucketService
 import com.benkyo.decks.utils.isValidLocaleCode
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.withContext
+import org.apache.commons.codec.digest.DigestUtils
+import org.apache.tika.parser.html.DataURISchemeUtil
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ServerWebExchange
+import java.io.ByteArrayInputStream
 import java.security.Principal
 import java.time.LocalDateTime
 import java.util.*
+import javax.imageio.ImageIO
 import javax.validation.Valid
 
 @RestController
@@ -28,6 +33,12 @@ class DeckController(
     private val deckRepository: DeckRepository,
     private val bucket: BucketService
 ) {
+    private val imageMimeTypes = listOf(
+        MediaType.IMAGE_GIF_VALUE,
+        MediaType.IMAGE_JPEG_VALUE,
+        MediaType.IMAGE_PNG_VALUE
+    )
+
     @GetMapping
     suspend fun getDecks(): Flow<Deck> = deckRepository.findAll().filter { !it.isPrivate }
 
@@ -85,6 +96,32 @@ class DeckController(
         if (request.targetLanguage != null && !request.targetLanguage.isValidLocaleCode())
             throw InvalidLocaleException(request.targetLanguage)
 
+        var imageHash: String? = null
+        if (request.image != null) {
+            val dataUri = DataURISchemeUtil().parse(request.image)
+            if (!dataUri.isBase64 || !imageMimeTypes.contains(dataUri.mediaType.toString()))
+                throw UnsupportedMimeTypeException(dataUri.mediaType.toString())
+
+            val data = withContext(Dispatchers.IO) {
+                val data = dataUri.inputStream.readAllBytes()
+                if (data.size > 32768)
+                    throw FileTooLargeException(data.size)
+
+                val image = ImageIO.read(ByteArrayInputStream(data))
+                if (image.width != image.height && image.width > 512)
+                    throw BadDimensionsException(image.width, image.height)
+
+                // TODO: Downscale the image?
+                return@withContext data
+            }
+            imageHash = DigestUtils.md5Hex(data)
+            bucket.put(
+                "decks/$imageHash",
+                dataUri.mediaType.toString(),
+                data
+            )
+        }
+
         return deckRepository.save(
             deck.copy(
                 description = request.description ?: deck.description,
@@ -93,6 +130,7 @@ class DeckController(
                 shortDescription = request.shortDescription ?: deck.shortDescription,
                 sourceLanguage = request.sourceLanguage ?: deck.sourceLanguage,
                 targetLanguage = request.targetLanguage ?: deck.targetLanguage,
+                imageHash = imageHash,
                 tags = request.tags
             )
         )

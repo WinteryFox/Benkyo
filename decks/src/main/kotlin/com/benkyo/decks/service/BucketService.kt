@@ -22,22 +22,34 @@ class BucketService(
         bucket: String = this.bucket,
         transform: (data: ByteArray?, response: GetObjectResponse?) -> T?
     ): T? = try {
-        val o = client.getObject(GetObjectRequest.builder().bucket(bucket).key(key).build())
-        transform(
-            withContext(Dispatchers.IO) {
-                o.readAllBytes()
-            },
-            o.response()
-        )
+        withContext(Dispatchers.IO) {
+            val o = client.getObject(GetObjectRequest.builder().bucket(bucket).key(key).build())
+            transform(
+                o.readAllBytes(),
+                o.response()
+            )
+        }
     } catch (_: NoSuchKeyException) {
         transform(null, null)
     } catch (e: S3Exception) {
         throw e
     }
 
+    // TODO: Add content MD5
     suspend fun put(
         key: String,
+        contentType: String,
         data: ByteArray,
         bucket: String = this.bucket
-    ) = client.putObject(PutObjectRequest.builder().bucket(bucket).key(key).build(), RequestBody.fromBytes(data))
+    ): PutObjectResponse = withContext(Dispatchers.IO) {
+        client.putObject(
+            PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .contentType(contentType)
+                .contentLength(data.size.toLong())
+                .build(),
+            RequestBody.fromBytes(data)
+        )
+    }
 }

@@ -31,6 +31,7 @@ dependencies {
     implementation("com.ibm.icu:icu4j-charset:71.1")
     implementation("com.ibm.icu:icu4j-localespi:71.1")
     implementation("software.amazon.awssdk:s3:2.17.194")
+    implementation("org.apache.tika:tika-java7:2.3.0")
 
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
     runtimeOnly("org.postgresql:postgresql")

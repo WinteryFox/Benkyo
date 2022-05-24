@@ -7,6 +7,7 @@ object ErrorCodes {
 
     // For some errors, we need to provide information on types of data that aren't entities
     private const val TYPE_LOCALE = 100
+    private const val TYPE_MEDIA = 200
 
     // Type of error we're dealing with
     private const val ERROR_UNAUTHORIZED = 20000
@@ -19,4 +20,8 @@ object ErrorCodes {
 
     const val DECK_NOT_FOUND = ERROR_NOT_FOUND + ENTITY_DECK
     const val CARD_NOT_FOUND = ERROR_NOT_FOUND + ENTITY_CARD
+
+    const val UNSUPPORTED_MIME_TYPE = ERROR_INVALID + TYPE_MEDIA
+    const val FILE_TOO_LARGE = ERROR_INVALID + TYPE_MEDIA + 1
+    const val BAD_DIMENSIONS = ERROR_INVALID + TYPE_MEDIA + 2
 }
