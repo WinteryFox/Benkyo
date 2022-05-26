@@ -2,6 +2,13 @@ package com.benkyo.decks.exceptions
 
 import com.benkyo.decks.ErrorCodes
 
+class FileNotFoundException(
+    key: String
+) : NotFoundException(
+    ErrorCodes.FILE_NOT_FOUND,
+    mapOf("key" to key)
+)
+
 class UnsupportedMimeTypeException(
     mimeType: String
 ) : BadRequestException(

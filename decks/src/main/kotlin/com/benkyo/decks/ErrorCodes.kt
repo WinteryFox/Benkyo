@@ -16,12 +16,14 @@ object ErrorCodes {
 
     const val UNAUTHORIZED = ERROR_UNAUTHORIZED
 
+    // Invalid error codes
     const val INVALID_LOCALE_CODE = ERROR_INVALID + TYPE_LOCALE
-
-    const val DECK_NOT_FOUND = ERROR_NOT_FOUND + ENTITY_DECK
-    const val CARD_NOT_FOUND = ERROR_NOT_FOUND + ENTITY_CARD
-
     const val UNSUPPORTED_MIME_TYPE = ERROR_INVALID + TYPE_MEDIA
     const val FILE_TOO_LARGE = ERROR_INVALID + TYPE_MEDIA + 1
     const val BAD_DIMENSIONS = ERROR_INVALID + TYPE_MEDIA + 2
+
+    // Not found error codes
+    const val DECK_NOT_FOUND = ERROR_NOT_FOUND + ENTITY_DECK
+    const val CARD_NOT_FOUND = ERROR_NOT_FOUND + ENTITY_CARD
+    const val FILE_NOT_FOUND = ERROR_NOT_FOUND + TYPE_MEDIA
 }

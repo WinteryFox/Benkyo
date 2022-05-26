@@ -84,12 +84,10 @@ class DeckController(
     ): Deck? {
         val user = userRepository.findById(principal.name)
             ?: throw UnauthorizedException()
-
         val deck = deckRepository.findById(id)
-
-        // TODO: See TODO in CardController about status codes
-        if (deck == null || deck.author != user.id)
-            throw DeckNotFoundException(id)
+            ?: throw DeckNotFoundException(id)
+        if (deck.author != user.id)
+            throw UnauthorizedException()
 
         if (request.sourceLanguage != null && !request.sourceLanguage.isValidLocaleCode())
             throw InvalidLocaleException(request.sourceLanguage)
@@ -137,7 +135,16 @@ class DeckController(
     }
 
     @GetMapping("/{id}", produces = [APPLICATION_JSON_VALUE])
-    suspend fun getDeck(@PathVariable id: String): Deck? = deckRepository.findById(id)
+    suspend fun getDeck(
+        principal: Principal,
+        @PathVariable id: String
+    ): Deck {
+        val deck = deckRepository.findById(id) ?: throw DeckNotFoundException(id)
+        if (deck.isPrivate && deck.author != principal.name)
+            throw UnauthorizedException()
+
+        return deck
+    }
 
     @DeleteMapping("/{id}")
     suspend fun deleteDeck(
@@ -145,20 +152,10 @@ class DeckController(
         exchange: ServerWebExchange,
         @PathVariable id: String
     ) {
-        val user = userRepository.findById(principal.name)
-
-        if (user == null) {
-            exchange.response.statusCode = HttpStatus.UNAUTHORIZED
-            return
-        }
-
-        val deck = deckRepository.findById(id)
-
-        if (deck == null || deck.author != user.id) {
-            // TODO: See TODO in CardController about status codes
-
-            throw DeckNotFoundException(id)
-        }
+        val user = userRepository.findById(principal.name) ?: throw UnauthorizedException()
+        val deck = deckRepository.findById(id) ?: throw DeckNotFoundException(id)
+        if (deck.author != user.id)
+            throw UnauthorizedException()
 
         deckRepository.deleteById(id)
     }
