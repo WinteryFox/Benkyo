@@ -6,7 +6,7 @@ import com.benkyo.decks.repository.DeckRepository
 import com.benkyo.decks.repository.UserRepository
 import com.benkyo.decks.request.DeckCreateRequest
 import com.benkyo.decks.request.DeckPatchRequest
-import com.benkyo.decks.service.BucketService
+import com.benkyo.decks.bucket.BucketService
 import com.benkyo.decks.utils.isValidLocaleCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

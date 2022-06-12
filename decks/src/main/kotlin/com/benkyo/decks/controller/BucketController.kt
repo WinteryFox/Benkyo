@@ -1,7 +1,7 @@
 package com.benkyo.decks.controller
 
 import com.benkyo.decks.exceptions.FileNotFoundException
-import com.benkyo.decks.service.BucketService
+import com.benkyo.decks.bucket.BucketService
 import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

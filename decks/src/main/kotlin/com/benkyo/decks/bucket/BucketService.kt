@@ -1,4 +1,4 @@
-package com.benkyo.decks.service
+package com.benkyo.decks.bucket
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,18 +21,18 @@ class BucketService(
         key: String,
         bucket: String = this.bucket,
         transform: (data: ByteArray?, response: GetObjectResponse?) -> T?
-    ): T? = try {
-        withContext(Dispatchers.IO) {
+    ): T? = withContext(Dispatchers.IO) {
+        try {
             val o = client.getObject(GetObjectRequest.builder().bucket(bucket).key(key).build())
             transform(
                 o.readAllBytes(),
                 o.response()
             )
+        } catch (_: NoSuchKeyException) {
+            transform(null, null)
+        } catch (e: S3Exception) {
+            throw e
         }
-    } catch (_: NoSuchKeyException) {
-        transform(null, null)
-    } catch (e: S3Exception) {
-        throw e
     }
 
     // TODO: Add content MD5
