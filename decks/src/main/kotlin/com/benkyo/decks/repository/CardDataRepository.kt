@@ -1,6 +1,6 @@
 package com.benkyo.decks.repository
 
-import com.benkyo.decks.data.Deck
+import com.benkyo.decks.data.CardData
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-interface DeckRepository : CoroutineCrudRepository<Deck, String>
+interface CardDataRepository : CoroutineCrudRepository<CardData, String>

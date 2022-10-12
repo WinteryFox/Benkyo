@@ -3,8 +3,10 @@ package com.benkyo.decks.data
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
-@Table("users")
-data class User(
+@Table("attachments")
+data class Attachment(
     @Id
-    val id: String
+    val id: String,
+    val hash: String,
+    val mime: String
 )

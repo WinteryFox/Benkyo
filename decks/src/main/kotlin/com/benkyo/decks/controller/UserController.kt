@@ -14,8 +14,6 @@ class UserController(
     private val repository: UserRepository
 ) {
     @GetMapping("/@me")
-    suspend fun getSelf(
-        exchange: ServerWebExchange,
-        principal: Principal
-    ): User? = repository.findById(principal.name) ?: User(principal.name, 0, null)
+    suspend fun getSelf(exchange: ServerWebExchange, principal: Principal): User? =
+        repository.findById(principal.name) ?: User(principal.name)
 }
